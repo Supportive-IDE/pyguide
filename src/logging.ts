@@ -519,7 +519,7 @@ export class Logger {
             const time = Date.now();
             let eventID = -1;
             if (currentLog) {
-                if (changes.length === 0) {
+                if (changes.length === 0) { // open save close action 
                     eventID = currentLog.addInteraction(doc.getText(), changes, time, eventType);
                 } else { 
                     for (const change of changes) {
