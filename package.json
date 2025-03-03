@@ -3,6 +3,8 @@
   "displayName": "PyGuide",
   "description": "Provides additional diagnostics for common Python mistakes",
   "version": "0.0.1",
+  "license": "MIT",
+  "repository": "https://github.com/Supportive-IDE/pyguide",
   "engines": {
     "vscode": "^1.97.0"
   },
