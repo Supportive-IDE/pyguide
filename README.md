@@ -6,12 +6,13 @@ UNDER DEVELOPMENT
 
 ## Features
 
-PyGuide detects code issues that may indicate a misunderstanding of a concept or syntax. These issues are highlighted in the same way as other issues 
-picked up by VS Code: with an underline and a message in the problems tab of your terminal.
+PyGuide detects code issues that may indicate a misunderstanding of a concept or syntax, or a simple typo. Detected issues are underlined, just like other issues picked up by VSCode. Hover over underlined code to get some quick feedback.
 
-\!\[feature X\]\(images/feature-x.png\)
+\!\[feature X\]\(images/problems.png\)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+Follow the action in the lightbulb menu to open more detailed guidance and interactive examples in your browser.
+
+You can also view detected issues in the Problems tab of your Terminal.
 
 ## Requirements
 
