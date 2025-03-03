@@ -589,6 +589,7 @@ export class Logger {
             const response = await axios.put(`${API_URL}/register`, { clientType: "VSCodeExtension"});
             return response.data;
         } catch (error) {
+            console.log(error);
             return UNREGISTERED;
         }
     }
@@ -601,6 +602,10 @@ export class Logger {
      */
     private async setUUID(context: ExtensionContext) {
         const STORAGE_KEY = `${context.extension.id}_UUID`;
+
+        // For debugging only!
+        // await context.globalState.update(STORAGE_KEY, undefined);
+
         let uuid: string | undefined = context.globalState.get(STORAGE_KEY);
         if (!context.globalState.get(STORAGE_KEY) && this.isActive) {
             Logger.registrationStatus = RegistrationStatus.idPending;

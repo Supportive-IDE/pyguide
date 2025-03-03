@@ -1,4 +1,4 @@
-export const API_URL = "http://actsidelib.its.york.ac.uk:80";
+export const API_URL = "https://side-api-562effcc639e.herokuapp.com";
 export const feedbackURL = "https://supportive-ide.github.io/symptom-feedback"; // http://localhost:3000 
 export const UNREGISTERED = "unregistered";
 export const EXTENSION_PUBLISHER = "supportive-ide";
