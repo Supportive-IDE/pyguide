@@ -6,7 +6,7 @@ import {
 } from 'vscode';
 const sideLib = require('./lib/side-lib.es.js');
 import { Feedback, SideLibResult } from './types';
-import { EXTENSION_ID, EventTypes, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators } from './utils';
+import { EXTENSION_ID, EventTypes, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators, feedbackURL } from './utils';
 import { Logger } from './logging';
 
 // Stores the parameters associated with each diagnostic
@@ -79,9 +79,10 @@ function createDiagnostic(feedback: Feedback, start: Position, end: Position, do
     const code = `${feedback.type}-${feedback.docIndex}`;
     diagnostic.code = {
         value: code,
-        target: Uri.parse(`command:${createCommand(SHOW_EXTERNAL_FEEDBACK)}?${encodeURIComponent(JSON.stringify([{msg: feedback.extendedFeedbackParams, fileName: docName}]))}`)
+        //target: Uri.parse(`command:${createCommand(SHOW_EXTERNAL_FEEDBACK)}?${encodeURIComponent(JSON.stringify([{msg: feedback.extendedFeedbackParams, fileName: docName}]))}`)
+        target: Uri.parse(feedbackURL + feedback.extendedFeedbackParams)
     };
-    paramsMap.set(code.value, feedback.extendedFeedbackParams);
+    paramsMap.set(code, feedback.extendedFeedbackParams);
     return diagnostic;
 }
 
@@ -143,10 +144,13 @@ export class ExtendedGuidance implements CodeActionProvider {
 
 	private createCommandCodeAction(diagnostic: Diagnostic, docName: string): CodeAction {
         const action = new CodeAction(`${this.isPunctuation(diagnostic.message.charAt(diagnostic.message.length - 1)) ? diagnostic.message : diagnostic.message + "." } Learn more...`, CodeActionKind.Empty);
-		const msg = diagnostic.code ? paramsMap.get(diagnostic.code.value) : "";
-        action.command = { command: createCommand(SHOW_EXTERNAL_FEEDBACK), title: `Learn more...`, tooltip: 'Open extended guidance.', arguments: [{msg: paramsMap.get(msg), fileName: docName}] };
-		action.diagnostics = [diagnostic];
-		action.isPreferred = true;
+		const code = diagnostic.code as { value: string; target: Uri; };
+        const msg = code ? paramsMap.get(code.value) : "";
+        if (msg) {
+            action.command = { command: createCommand(SHOW_EXTERNAL_FEEDBACK), title: `Learn more...`, tooltip: 'Open extended guidance.', arguments: [{msg: msg + "&TEST=TEST", fileName: docName}] };
+            action.diagnostics = [diagnostic];
+            action.isPreferred = true;
+        }
         return action;
 	}
 }

@@ -1,12 +1,13 @@
 # pyguide README
 
-This is the README for your extension "pyguide". After writing up a brief description, we recommend including the following sections.
+Provides additional Python diagnostic messages aimed at beginners.
+
+UNDER DEVELOPMENT
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
-
-For example if there is an image subfolder under your extension project workspace:
+PyGuide detects code issues that may indicate a misunderstanding of a concept or syntax. These issues are highlighted in the same way as other issues 
+picked up by VS Code: with an underline and a message in the problems tab of your terminal.
 
 \!\[feature X\]\(images/feature-x.png\)
 

@@ -20,7 +20,7 @@ export async function activate(context: ExtensionContext) {
 		}),
 		commands.registerCommand(createCommand(SHOW_EXTERNAL_FEEDBACK), (args: any) => {
             logger.logAction(args.msg, args.fileName);
-            env.openExternal(Uri.parse(feedbackURL + args.msg));
+			env.openExternal(Uri.parse(feedbackURL + args.msg));
         }),
         sideDiagnostics,
         languages.registerCodeActionsProvider('python', new ExtendedGuidance(), {
