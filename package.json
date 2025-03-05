@@ -1,6 +1,7 @@
 {
   "name": "pyguide",
   "displayName": "PyGuide",
+  "publisher": "supportive-ide",
   "description": "Provides additional diagnostics for common Python mistakes",
   "version": "0.0.1",
   "license": "MIT",
