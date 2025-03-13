@@ -1,5 +1,5 @@
 import {commands, Disposable, ExtensionContext, languages, workspace } from 'vscode';
-import { ExtendedGuidance, subscribeToDocumentChanges } from './diagnostics';
+import { ExtendedGuidance, paramsMap, subscribeToDocumentChanges } from './diagnostics';
 import { createCommand, DISABLE, ENABLE, EXTENSION_ID, SHOW_EXTERNAL_FEEDBACK } from './utils';
 import { Logger } from './logging';
 import { createAndShowWebview } from './webview';
@@ -19,10 +19,20 @@ export async function activate(context: ExtensionContext) {
 		commands.registerCommand(createCommand(DISABLE), () => {
 			workspace.getConfiguration(EXTENSION_ID).update(ENABLE, false, true);
 		}),
+		// Code action click
 		commands.registerCommand(createCommand(SHOW_EXTERNAL_FEEDBACK), (args: any) => {
-            logger.logAction(args.msg, args.fileName);
-			createAndShowWebview(args.msg);
+			logger.logAction(args.msg, args.fileName);
+			createAndShowWebview(args.msg + `&log=${logger.isLogActive()}`);
         }),
+		commands.registerCommand(createCommand("test"), (args: any) => {
+			const params = paramsMap.get(args.code);
+			if (params) {
+				logger.logAction(params, args.fileName);
+				createAndShowWebview(params + `&log=${logger.isLogActive()}`)
+			} else {
+				console.log(params, "not found")
+			}
+		}),
         sideDiagnostics,
         languages.registerCodeActionsProvider('python', new ExtendedGuidance(), {
                 providedCodeActionKinds: ExtendedGuidance.providedCodeActionKinds

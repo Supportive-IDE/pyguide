@@ -611,7 +611,7 @@ export class Logger {
         const STORAGE_KEY = `${context.extension.id}_UUID`;
 
         // For debugging only!
-        await context.globalState.update(STORAGE_KEY, undefined);
+        // await context.globalState.update(STORAGE_KEY, undefined);
 
         let uuid: string | undefined = context.globalState.get(STORAGE_KEY);
         if (!context.globalState.get(STORAGE_KEY) && this.isActive) {
@@ -650,5 +650,13 @@ export class Logger {
                 await log.startSession();
             }
         }
+    }
+
+    /**
+     * Get the logging status
+     * @returns Whether or not the log is active
+     */
+    isLogActive() {
+        return this.isActive;
     }
 }

@@ -10,7 +10,7 @@ import { EXTENSION_ID, EventTypes, SHOW_EXTERNAL_FEEDBACK, createCommand, errorI
 import { Logger } from './logging';
 
 // Stores the parameters associated with each diagnostic
-const paramsMap = new Map<string, string>();
+export const paramsMap = new Map<string, string>();
 
 /**
  * Gets all feedback instances from SIDE-lib and creates diagnostics. 
@@ -77,9 +77,12 @@ function createDiagnostic(feedback: Feedback, start: Position, end: Position, do
     );
     diagnostic.source = EXTENSION_ID;
     const code = `${feedback.type}-${feedback.docIndex}`;
+    const args = [{msg: feedback.extendedFeedbackParams, fileName: docName, source:"createDiagnostic"}];
+    const codeLookup = [{code, fileName: docName}];
     diagnostic.code = {
         value: code,
-        target: Uri.parse(`command:${createCommand(SHOW_EXTERNAL_FEEDBACK)}?${encodeURIComponent(JSON.stringify([{msg: feedback.extendedFeedbackParams, fileName: docName}]))}`)
+        //target: Uri.parse(`command:${createCommand(SHOW_EXTERNAL_FEEDBACK)}?${encodeURIComponent(JSON.stringify(args))}`)
+        target: Uri.parse(`command:${createCommand("test")}?${encodeURIComponent(JSON.stringify(codeLookup))}`)
     };
     paramsMap.set(code, feedback.extendedFeedbackParams);
     return diagnostic;
@@ -146,10 +149,11 @@ export class ExtendedGuidance implements CodeActionProvider {
 		const code = diagnostic.code as { value: string; target: Uri; };
         const msg = code ? paramsMap.get(code.value) : "";
         if (msg) {
-            action.command = { command: createCommand(SHOW_EXTERNAL_FEEDBACK), title: `Learn more...`, tooltip: 'Open extended guidance.', arguments: [{msg: msg + "&TEST=TEST", fileName: docName}] };
+            action.command = { command: createCommand(SHOW_EXTERNAL_FEEDBACK), title: `Learn more...`, tooltip: 'Open extended guidance.', arguments: [{msg: msg, fileName: docName, source:"createCommandAction"}] };
             action.diagnostics = [diagnostic];
             action.isPreferred = true;
         }
+        
         return action;
 	}
 }
