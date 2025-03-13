@@ -1,7 +1,8 @@
 import { ExtensionContext, workspace, env, ConfigurationChangeEvent, window, TextDocument, TextDocumentContentChangeEvent } from 'vscode';
 import axios from 'axios';
 import { v4 as uuidV4 } from 'uuid';
-import { API_URL, EXTENSION_ID, EventTypes, PRIVACY, UNREGISTERED, createCommand } from './utils';
+import { EXTENSION_ID, EventTypes, PRIVACY, UNREGISTERED, createCommand } from './utils';
+import { API_URL } from './urls';
 import { Feedback, Misconception, SideLibResult } from './types';
 
 
@@ -449,6 +450,7 @@ export class Logger {
     private uuid: string | undefined;
     private fileIDs: Map<string, FileLog>;
     private isActive: boolean;
+    private localContext: ExtensionContext;
     private static logLevel: boolean;
     private static registrationStatus: number = RegistrationStatus.idPending;
 
@@ -461,11 +463,11 @@ export class Logger {
         this.fileIDs = new Map();
 
         // Get the UUID for this client
+        this.localContext = context;
         this.setUUID(context);
 
         // Listen for telemetry events and push to disposables subscription
-        context.subscriptions.push(env.onDidChangeTelemetryEnabled(e => this.isActive = e));
-        context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.updateLogLevel(e)));
+        context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.updateLogLevel(e))); // This is causing the rejected promise error
     }
 
 
@@ -479,10 +481,15 @@ export class Logger {
             const allowLogging = workspace.getConfiguration().get(`${EXTENSION_ID}.${PRIVACY}`) as boolean;
             Logger.logLevel = allowLogging;
             this.isActive = env.isTelemetryEnabled && Logger.logLevel;
-            if (this.uuid === UNREGISTERED && allowLogging) {
-                Logger.registrationStatus = RegistrationStatus.idRefused; // Not accurate but will prevent events being stored while they can't be logged
+            if (allowLogging) {
+                if (this.uuid === UNREGISTERED) {
+                    this.setUUID(this.localContext); // Get the client ID first
+                } else {
+                    // start a new session
+                    this.updatePendingEvents();
+                }
             }
-            window.showInformationMessage(`PyGuide research data logging ${allowLogging ? "turned on. Restart VS Code to activate." : "turned off"}`);
+            window.showInformationMessage(`PyGuide research data logging ${allowLogging ? "turned on." : "turned off"}`);
         }
     }
 
@@ -514,7 +521,7 @@ export class Logger {
         if (this.isActive && Logger.registrationStatus !== RegistrationStatus.idRefused) {
             if (!this.fileIDs.has(doc.fileName)) {
                 this.fileIDs.set(doc.fileName, new FileLog(this.uuid ? this.uuid : UNREGISTERED));
-            }
+            }    
             const currentLog = this.fileIDs.get(doc.fileName);
             const time = Date.now();
             let eventID = -1;
@@ -604,24 +611,33 @@ export class Logger {
         const STORAGE_KEY = `${context.extension.id}_UUID`;
 
         // For debugging only!
-        // await context.globalState.update(STORAGE_KEY, undefined);
+        await context.globalState.update(STORAGE_KEY, undefined);
 
         let uuid: string | undefined = context.globalState.get(STORAGE_KEY);
         if (!context.globalState.get(STORAGE_KEY) && this.isActive) {
             Logger.registrationStatus = RegistrationStatus.idPending;
-            uuid = await this.registerWithDB();
-            if (uuid !== UNREGISTERED) {
-                await context.globalState.update(STORAGE_KEY, uuid);
+            try {
+                uuid = await this.registerWithDB();
+                if (uuid !== UNREGISTERED) {
+                    context.globalState.update(STORAGE_KEY, uuid)
+                        .then(update => console.log("PyGuide UUID stored"))
+                        .then(undefined, err => console.log(err));
+                    
+                }
+            } catch (regError) {
+                console.log(regError);
             }
+            
         } 
-        this.uuid = uuid;
+        this.uuid = uuid !== undefined ? uuid : UNREGISTERED;
         if (this.uuid !== UNREGISTERED) {
             this.updatePendingEvents();
             Logger.registrationStatus = RegistrationStatus.idReceived;
         } else {
-            console.log("PyGuide unable to register this client!");
+            console.log("PyGuide unable to register this client! Logging is on?", this.isActive);
             Logger.registrationStatus = RegistrationStatus.idRefused;
         }
+        console.log("PyGuide UUID:", this.uuid);
     }
 
     /**

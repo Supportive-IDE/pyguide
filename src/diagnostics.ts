@@ -6,7 +6,7 @@ import {
 } from 'vscode';
 const sideLib = require('./lib/side-lib.es.js');
 import { Feedback, SideLibResult } from './types';
-import { EXTENSION_ID, EventTypes, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators, feedbackURL } from './utils';
+import { EXTENSION_ID, EventTypes, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators } from './utils';
 import { Logger } from './logging';
 
 // Stores the parameters associated with each diagnostic
@@ -79,8 +79,7 @@ function createDiagnostic(feedback: Feedback, start: Position, end: Position, do
     const code = `${feedback.type}-${feedback.docIndex}`;
     diagnostic.code = {
         value: code,
-        //target: Uri.parse(`command:${createCommand(SHOW_EXTERNAL_FEEDBACK)}?${encodeURIComponent(JSON.stringify([{msg: feedback.extendedFeedbackParams, fileName: docName}]))}`)
-        target: Uri.parse(feedbackURL + feedback.extendedFeedbackParams)
+        target: Uri.parse(`command:${createCommand(SHOW_EXTERNAL_FEEDBACK)}?${encodeURIComponent(JSON.stringify([{msg: feedback.extendedFeedbackParams, fileName: docName}]))}`)
     };
     paramsMap.set(code, feedback.extendedFeedbackParams);
     return diagnostic;

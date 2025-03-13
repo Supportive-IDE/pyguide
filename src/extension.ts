@@ -1,7 +1,8 @@
-import {commands, Disposable, env, ExtensionContext, languages, Uri, workspace} from 'vscode';
+import {commands, Disposable, ExtensionContext, languages, workspace } from 'vscode';
 import { ExtendedGuidance, subscribeToDocumentChanges } from './diagnostics';
-import { createCommand, DISABLE, ENABLE, EXTENSION_ID, feedbackURL, SHOW_EXTERNAL_FEEDBACK } from './utils';
+import { createCommand, DISABLE, ENABLE, EXTENSION_ID, SHOW_EXTERNAL_FEEDBACK } from './utils';
 import { Logger } from './logging';
+import { createAndShowWebview } from './webview';
 
 let disposables: Disposable[] = [];
 
@@ -20,7 +21,7 @@ export async function activate(context: ExtensionContext) {
 		}),
 		commands.registerCommand(createCommand(SHOW_EXTERNAL_FEEDBACK), (args: any) => {
             logger.logAction(args.msg, args.fileName);
-			env.openExternal(Uri.parse(feedbackURL + args.msg));
+			createAndShowWebview(args.msg);
         }),
         sideDiagnostics,
         languages.registerCodeActionsProvider('python', new ExtendedGuidance(), {
