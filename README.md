@@ -1,4 +1,4 @@
-# pyguide README
+# PyGuide Extension for Visual Studio Code
 
 Provides additional Python diagnostic messages aimed at beginners.
 
@@ -6,12 +6,9 @@ UNDER DEVELOPMENT
 
 ## Features
 
-PyGuide detects code issues that may indicate a misunderstanding of a concept or syntax, or a simple typo. Detected issues are underlined, just like other issues picked up by VSCode. By default, some quick feedback is displayed over underlined code. 
+PyGuide detects code issues that may indicate a misunderstanding of a concept or syntax, or a simple typo. Detected issues are underlined, just like other issues picked up by VSCode. By default, some quick feedback is displayed over underlined code. Click the message to open more detailed guidance.
 
 ![A brief feedback message is displayed over underlined code](images/codelens.png)
-
-Click the message to open more detailed guidance.
-![Clicking the message above the code opens more guidance](images/codelens.gif)
 
 If the "showCodeLens" setting is disabled, hover over underlined code to get some quick feedback.
 
