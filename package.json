@@ -3,6 +3,7 @@
   "displayName": "PyGuide",
   "publisher": "supportive-ide",
   "description": "Provides additional diagnostics for common Python mistakes",
+  "icon": "images/icon.png",
   "version": "0.0.4",
   "license": "MIT",
   "repository": "https://github.com/Supportive-IDE/pyguide",
