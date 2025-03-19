@@ -2,7 +2,10 @@ export const UNREGISTERED = "unregistered";
 export const EXTENSION_PUBLISHER = "supportive-ide";
 export const EXTENSION_ID = "pyguide";
 export const PRIVACY = "researchDataPrivacy"; // Also in package.json
+export const SHOW_CODE_LENS = "showCodeLens"; // Also in package.json
 export const SHOW_EXTERNAL_FEEDBACK = "showExternalFeedback";
+export const DIAGNOSTIC_EXTERNAL_FEEDBACK = "diagnosticExternalFeedback";
+export const CODELENS_EXTERNAL_FEEDBACK = "codelensExternalFeedback";
 export const ENABLE = "enable"; // package.json
 export const DISABLE = "disable"; // package.json
 

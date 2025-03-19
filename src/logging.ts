@@ -221,17 +221,20 @@ class FeedbackEvent extends AbstractEvent {
  */
 class FeedbackActionEvent extends AbstractEvent {
     private extendedFeedbackParams: string;
+    private type: string;
 
-    constructor(eventID: number, extendedFeedbackParams: string) {
+    constructor(eventID: number, extendedFeedbackParams: string, actionType: string) {
         super(eventID.toString());
         this.extendedFeedbackParams = extendedFeedbackParams;
+        this.type = actionType;
     }
 
     toLogFormat(clientID: string, sessionID: string): {} {
         return {
             clientID, sessionID,
             eventID: this.getEventID(),
-            extendedFeedbackParams: this.extendedFeedbackParams
+            extendedFeedbackParams: this.extendedFeedbackParams,
+            type: this.type
         };
     }
 
@@ -330,9 +333,10 @@ class FileLog {
      * Track an action on feedback (request for extra guidance)
      * @param eventID The ID of the event the feedback is associated with
      * @param feedbackParams The URL params for the extended guidance
+     * @param actionSource e.g. code action, diagnostics, code lens
      */
-    addFeedbackAction(eventID: number, feedbackParams: string) {
-        this.feedbackActionEvents.push(new FeedbackActionEvent(eventID, feedbackParams));
+    addFeedbackAction(eventID: number, feedbackParams: string, actionSource: string) {
+        this.feedbackActionEvents.push(new FeedbackActionEvent(eventID, feedbackParams, actionSource));
     }
 
 
@@ -553,8 +557,9 @@ export class Logger {
      * Logs a feedback action event
      * @param params The URL params for the extended feedback
      * @param fileName The name of the active file in the editor
+     * @param source The source of the action e.g. code action, diagnostics, code lens
      */
-    public logAction(params: string, fileName: string) {
+    public logAction(params: string, fileName: string, source: string) {
         if (this.isActive && Logger.registrationStatus !== RegistrationStatus.idRefused) {
             if (!this.fileIDs.has(fileName)) {
                 this.fileIDs.set(fileName, new FileLog(this.uuid ? this.uuid : UNREGISTERED));
@@ -563,7 +568,7 @@ export class Logger {
             const time = Date.now();
             if (currentLog) {
                 const eventID = currentLog.addInteraction("", [], time, EventTypes.action);
-                currentLog.addFeedbackAction(eventID, params);
+                currentLog.addFeedbackAction(eventID, params, source);
                 if (this.logIsReady(currentLog)) {
                     currentLog.checkAndSendData();
                 }

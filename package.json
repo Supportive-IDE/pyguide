@@ -3,7 +3,7 @@
   "displayName": "PyGuide",
   "publisher": "supportive-ide",
   "description": "Provides additional diagnostics for common Python mistakes",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "repository": "https://github.com/Supportive-IDE/pyguide",
   "engines": {
@@ -42,6 +42,12 @@
             "usesOnlineServices",
             "telemetry"
           ]
+        },
+        "pyguide.showCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Display feedback message above diagnostic. Click the message to access extended guidance.",
+          "tags":["help", "guidance"]
         }
       }
     }
