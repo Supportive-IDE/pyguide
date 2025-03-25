@@ -1,5 +1,5 @@
 import { feedbackURL } from "./urls";
-import { window, ViewColumn } from "vscode";
+import { window, ViewColumn, env, Uri } from "vscode";
 
 
 /**
@@ -44,3 +44,4 @@ function getWebviewContents(urlParams: string) {
         </body>
     </html>`
 }
+

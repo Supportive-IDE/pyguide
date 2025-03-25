@@ -10,7 +10,7 @@ import {
 } from 'vscode';
 const sideLib = require('./lib/side-lib.es.js');
 import { Feedback, SideLibResult } from './types';
-import { CODELENS_EXTERNAL_FEEDBACK, DIAGNOSTIC_EXTERNAL_FEEDBACK, EXTENSION_ID, EventTypes, SHOW_CODE_LENS, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators } from './utils';
+import { CODELENS_EXTERNAL_FEEDBACK, DIAGNOSTIC_EXTERNAL_FEEDBACK, EXTENSION_ID, EventTypes, REQUEST_USER_INPUT, SHOW_CODE_LENS, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators, warningIndicators } from './utils';
 import { Logger } from './logging';
 
 // Stores the parameters associated with each diagnostic
@@ -18,7 +18,6 @@ export const paramsMap = new Map<string, string>();
 
 /**
  * Gets all feedback instances from SIDE-lib and creates diagnostics. 
- * This demo diagnostic problem provider finds all mentions of 'emoji'.
  * @param doc text document to analyze
  * @param sideDiagnostics diagnostic collection
  * @param sideLens code lens provider
@@ -41,21 +40,53 @@ export function refreshDiagnostics(doc: TextDocument,
 
         // Log all results
         sendToLog(doc, result, logger, changes, eventType);
+
+        const feedbackCountByLine = getFeedbackCountByLine(result.feedback, doc);
+
         // Update the diagnostics
         for (const feedback of result.feedback) {
+            const endIndex = feedback.docIndex + feedback.affectedText.length;
+            const startPos = doc.positionAt(feedback.docIndex);
             // Create diagnostics
-            const diagnostic = createDiagnostic(feedback, doc.positionAt(feedback.docIndex), doc.positionAt(feedback.docIndex + feedback.affectedText.length), doc.fileName);
+            const diagnostic = createDiagnostic(feedback, startPos, doc.positionAt(endIndex), doc.fileName);
             diagnostics.push(diagnostic);
             // Create code lenses
             if (FeedbackLens.enabled) {
-                const codeLens = sideLens.createCodeLens(feedback, doc.positionAt(feedback.docIndex), doc.positionAt(feedback.docIndex + feedback.affectedText.length), doc.fileName);
+                const codeLens = sideLens.createCodeLens(feedback, startPos, doc.positionAt(endIndex), doc.fileName);
                 codeLenses.push(codeLens);
-                sideLens.refreshCodeLenses(codeLenses);
+                // Only request user input if: 
+                // logging is active 
+                // input has not already been received for this misconception
+                // there is only one issue on this line
+                if (logger.isLogActive() && feedbackCountByLine.get(startPos.line) && feedbackCountByLine.get(startPos.line) === 1 && !logger.haveReceivedUserInputFor(feedback.type)) {
+                    const inputRequest = sideLens.createInputLink(feedback, startPos, startPos, doc.fileName);
+                    codeLenses.push(inputRequest);
+                }
+                
             }
         }
+        sideLens.refreshCodeLenses(codeLenses);
 
         sideDiagnostics.set(doc.uri, diagnostics);
     }
+}
+
+
+/**
+ * Helper function to count the number of feedback messages starting on a particular line
+ * @param feedbackMessages The feedback objects from SIDE-lib
+ * @param doc The text document
+ * @returns A map of line number : count. Lines with no feedback are not included.
+ */
+function getFeedbackCountByLine(feedbackMessages: Feedback[], doc: TextDocument) {
+    const feedbackCountByLine = new Map<number, number>();
+    const lineNumbers = feedbackMessages.map(f => doc.positionAt(f.docIndex).line);
+    for (const num of lineNumbers) {
+        const count = feedbackCountByLine.get(num);
+        feedbackCountByLine.set(num, count !== undefined ? count + 1 : 1);
+        
+    }
+    return feedbackCountByLine;
 }
 
 
@@ -85,13 +116,13 @@ function sendToLog(doc: TextDocument, result: SideLibResult, logger: Logger, cha
 function createDiagnostic(feedback: Feedback, start: Position, end: Position, docName: string) {
     const range = new Range(start, end);
     const message = feedback.firstMessage;
-    const severity = errorIndicators.has(feedback.type) ? DiagnosticSeverity.Error : DiagnosticSeverity.Information;
+    const severity = warningIndicators.has(feedback.type) ? DiagnosticSeverity.Warning : errorIndicators.has(feedback.type) ? DiagnosticSeverity.Error : DiagnosticSeverity.Information;
     const diagnostic = new Diagnostic(
         range, message, severity 
     );
     diagnostic.source = EXTENSION_ID;
     const code = `${feedback.type}-${feedback.docIndex}`;
-    const args = [{msg: feedback.extendedFeedbackParams, fileName: docName, source:"createDiagnostic"}];
+    // const args = [{msg: feedback.extendedFeedbackParams, fileName: docName, source:"createDiagnostic"}];
     const codeLookup = [{code, fileName: docName}];
     diagnostic.code = {
         value: code,
@@ -103,7 +134,6 @@ function createDiagnostic(feedback: Feedback, start: Position, end: Position, do
 
 /**
  * Listens for document changes and trigger a refresh of the diagnostics
- * TODO: modify this so that it updates EITHER diagnostics OR code lenses
  * @param context the extension context
  * @param sideDiagnostics the diagnostics generated by SIDE-lib
  * @param sideLens the code lens provider
@@ -201,10 +231,21 @@ export class FeedbackLens implements CodeLensProvider {
         return new CodeLens(
             new Range(start, end),
             {
-                title: feedback.firstMessage,
+                title: `${feedback.firstMessage}. Learn more...`,
                 command: createCommand(CODELENS_EXTERNAL_FEEDBACK),
                 tooltip: 'Click for more help',
                 arguments: [{msg: feedback.extendedFeedbackParams, fileName: docName, source:"CodeLens"}]
+            }
+        )
+    }
+
+    public createInputLink(feedback: Feedback, start:Position, end:Position, docName: string) {
+        return new CodeLens(
+            new Range(start, end),
+            {
+                title: `Was this feedback helpful?`,
+                command: createCommand(REQUEST_USER_INPUT),
+                arguments: [{misconType: feedback.type, message: feedback.firstMessage, extendedParams: feedback.extendedFeedbackParams, fileName: docName}] 
             }
         )
     }
