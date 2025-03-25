@@ -3,6 +3,9 @@ export const EXTENSION_PUBLISHER = "supportive-ide";
 export const EXTENSION_ID = "pyguide";
 // Feedback global variable suffix (combined with extension id)
 export const FEEDBACK_RECEIVED_FOR = "_feedback_for";
+// Install date (used to decide when to trigger prompt to participate in research)
+export const INSTALL_DATE = "_install_date";
+export const RESEARCH_PROMPT_SENT = "_research_prompt";
 
 // Config settings
 export const PRIVACY = "allowLogging"; // Also in package.json
@@ -20,6 +23,7 @@ export const ENABLE = "enable"; // package.json
 export const DISABLE = "disable"; // package.json
 
 // Feedback responses
+export const AGREE_TO_HELP = "I'll help";
 export const MISSED_ISSUE = "Yes - I missed this issue";
 export const LEARNED_SOMETHING = "Yes - I learned something";
 export const CANT_FIX = "No - I don't know how to fix the issue";
