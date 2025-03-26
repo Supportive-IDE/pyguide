@@ -4,7 +4,7 @@
   "publisher": "supportive-ide",
   "description": "Provides additional diagnostics for common Python mistakes",
   "icon": "images/icon.png",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "repository": "https://github.com/Supportive-IDE/pyguide",
   "engines": {
@@ -35,10 +35,10 @@
     "configuration": {
       "title": "PyGuide",
       "properties": {
-        "pyguide.researchDataPrivacy": {
+        "pyguide.allowLogging": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "Allow usage data collection for a research project investigating symptoms of misconceptions about the Python. ",
+          "markdownDescription": "I consent to usage data collection for a research project exploring how to improve feeback for beginner programmers. ADD LINK Click here to learn about the project and how we store and use your data.",
           "tags": [
             "usesOnlineServices",
             "telemetry"
@@ -47,8 +47,8 @@
         "pyguide.showCodeLens": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "Display feedback message above diagnostic. Click the message to access extended guidance.",
-          "tags":["help", "guidance"]
+          "markdownDescription": "Display feedback messages in the code. If this is not ticked, only diagnostics (underlines) will be shown.",
+          "tags":["help", "guidance", "configuration"]
         }
       }
     }

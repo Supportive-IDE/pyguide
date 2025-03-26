@@ -1,7 +1,7 @@
-import { ExtensionContext, workspace, env, ConfigurationChangeEvent, window, TextDocument, TextDocumentContentChangeEvent } from 'vscode';
+import { ExtensionContext, workspace, env, ConfigurationChangeEvent, window, TextDocument, TextDocumentContentChangeEvent, ConfigurationTarget } from 'vscode';
 import axios from 'axios';
 import { v4 as uuidV4 } from 'uuid';
-import { EXTENSION_ID, EventTypes, PRIVACY, UNREGISTERED, createCommand } from './utils';
+import { EXTENSION_ID, EventTypes, FEEDBACK_RECEIVED_FOR, PRIVACY, RESEARCH_PROMPT_SENT, UNREGISTERED, createCommand } from './utils';
 import { API_URL } from './urls';
 import { Feedback, Misconception, SideLibResult } from './types';
 
@@ -380,6 +380,10 @@ class FileLog {
         this.clientID = newID;
     }
 
+    getSessionID() {
+        return this.sessionID;
+    }
+
 
     /**
      * Convert all tracked objects to object literals to be sent to the database
@@ -453,10 +457,12 @@ export class Logger {
     private static instance: Logger;
     private uuid: string | undefined;
     private fileIDs: Map<string, FileLog>;
-    private isActive: boolean;
+    private isActive: boolean; // The extension log permission is granted AND telemetry is enabled overall
     private localContext: ExtensionContext;
     private static logLevel: boolean;
     private static registrationStatus: number = RegistrationStatus.idPending;
+    private userInputCheckComplete: boolean = false;
+    private inputReceivedFor: string[] = [];
 
     private constructor(context: ExtensionContext) {
         const privacy = workspace.getConfiguration().get(createCommand(PRIVACY)) as boolean;
@@ -464,14 +470,38 @@ export class Logger {
 
         // Check user settings for telemetry (only log if it is enabled and logLevel is higher than none)
         this.isActive = env.isTelemetryEnabled && Logger.logLevel;
+
         this.fileIDs = new Map();
 
         // Get the UUID for this client
         this.localContext = context;
         this.setUUID(context);
 
+        this.getMisconsWithFeedback(context); // get the list of misconceptions that the user has already provided feedback for
+
         // Listen for telemetry events and push to disposables subscription
         context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.updateLogLevel(e))); // This is causing the rejected promise error
+    }
+
+
+    private async getMisconsWithFeedback(context: ExtensionContext) {
+        // Get the misconceptions that have already had feedback
+        const STORAGE_KEY = `${context.extension.id}${FEEDBACK_RECEIVED_FOR}`;
+        const prevMiscons = await context.globalState.get(STORAGE_KEY);
+        if (Array.isArray(prevMiscons)) {
+            this.inputReceivedFor = prevMiscons;        
+        }
+        this.userInputCheckComplete = true;
+    }
+
+    haveReceivedUserInputFor(misconType: string) {
+        // return true if still waiting on retrieving from storage
+        return this.userInputCheckComplete === false || this.inputReceivedFor.includes(misconType);
+    }
+
+
+    userInputReceivedFor(misconType: string) {
+        this.inputReceivedFor.push(misconType);
     }
 
 
@@ -486,6 +516,8 @@ export class Logger {
             Logger.logLevel = allowLogging;
             this.isActive = env.isTelemetryEnabled && Logger.logLevel;
             if (allowLogging) {
+                const STORAGE_PROMPT = `${this.localContext.extension.id}${RESEARCH_PROMPT_SENT}`;
+                this.localContext.globalState.update(STORAGE_PROMPT, true);
                 if (this.uuid === UNREGISTERED) {
                     this.setUUID(this.localContext); // Get the client ID first
                 } else {
@@ -522,11 +554,13 @@ export class Logger {
     public log(doc: TextDocument, changes: readonly TextDocumentContentChangeEvent[],
                 sideLibResult: SideLibResult, eventType: EventTypes | undefined
     ) {
+        // Logger.feedbackRequester.checkAndRequest(); // initiate feedback request, if it's time
         if (this.isActive && Logger.registrationStatus !== RegistrationStatus.idRefused) {
             if (!this.fileIDs.has(doc.fileName)) {
                 this.fileIDs.set(doc.fileName, new FileLog(this.uuid ? this.uuid : UNREGISTERED));
             }    
             const currentLog = this.fileIDs.get(doc.fileName);
+
             const time = Date.now();
             let eventID = -1;
             if (currentLog) {
@@ -573,6 +607,27 @@ export class Logger {
                     currentLog.checkAndSendData();
                 }
             }
+        }
+    }
+
+
+    public async logUserInput(misconName: string, firstMessage: string, params: string, usefulness: string, fileName: string, comments: string = "") {
+        // Send to server
+        try {
+            if (!this.fileIDs.has(fileName)) {
+                this.fileIDs.set(fileName, new FileLog(this.uuid ? this.uuid : UNREGISTERED));
+            }
+            const currentLog = this.fileIDs.get(fileName);
+            await axios.put(`${API_URL}/userinput`, { 
+                clientID: this.uuid, sessionID: currentLog?.getSessionID(),
+                misconceptionName: misconName,
+                firstMessage,
+                extendedFeedbackParams: params,
+                usefulness,
+                comments
+            });
+        } catch (error) {
+            console.log("PyGuide couldn't start a logging session:", error);
         }
     }
 
