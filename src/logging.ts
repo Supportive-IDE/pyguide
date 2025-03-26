@@ -1,7 +1,7 @@
 import { ExtensionContext, workspace, env, ConfigurationChangeEvent, window, TextDocument, TextDocumentContentChangeEvent, ConfigurationTarget } from 'vscode';
 import axios from 'axios';
 import { v4 as uuidV4 } from 'uuid';
-import { EXTENSION_ID, EventTypes, FEEDBACK_RECEIVED_FOR, PRIVACY, UNREGISTERED, createCommand } from './utils';
+import { EXTENSION_ID, EventTypes, FEEDBACK_RECEIVED_FOR, PRIVACY, RESEARCH_PROMPT_SENT, UNREGISTERED, createCommand } from './utils';
 import { API_URL } from './urls';
 import { Feedback, Misconception, SideLibResult } from './types';
 
@@ -516,6 +516,8 @@ export class Logger {
             Logger.logLevel = allowLogging;
             this.isActive = env.isTelemetryEnabled && Logger.logLevel;
             if (allowLogging) {
+                const STORAGE_PROMPT = `${this.localContext.extension.id}${RESEARCH_PROMPT_SENT}`;
+                this.localContext.globalState.update(STORAGE_PROMPT, true);
                 if (this.uuid === UNREGISTERED) {
                     this.setUUID(this.localContext); // Get the client ID first
                 } else {

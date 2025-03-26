@@ -4,7 +4,7 @@
   "publisher": "supportive-ide",
   "description": "Provides additional diagnostics for common Python mistakes",
   "icon": "images/icon.png",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "repository": "https://github.com/Supportive-IDE/pyguide",
   "engines": {
@@ -38,7 +38,7 @@
         "pyguide.allowLogging": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "Allow usage data collection for a research project exploring how to improve feeback for beginner programmers. ADD LINK Click here to learn about the project and how we store and use your data.",
+          "markdownDescription": "I consent to usage data collection for a research project exploring how to improve feeback for beginner programmers. ADD LINK Click here to learn about the project and how we store and use your data.",
           "tags": [
             "usesOnlineServices",
             "telemetry"
