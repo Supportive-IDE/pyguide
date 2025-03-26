@@ -251,7 +251,7 @@ export class FeedbackLens implements CodeLensProvider {
     }
 
     public refreshCodeLenses(codeLenses: CodeLens[]) {
-        this.codeLenses = codeLenses;
+        this.codeLenses = FeedbackLens.enabled ? codeLenses : [];
         this._onDidChangeCodeLenses.fire();
     }
 
