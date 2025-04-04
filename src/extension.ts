@@ -141,7 +141,6 @@ async function getUserInput(args: {misconType: string, message: string, extended
 		logger.logUserInput(args.misconType, args.message, args.extendedParams, input, args.fileName);
 		userInputReceived(args.misconType, context, logger);
 	}
-	// TODO: Update info in settings - also need way to prompt user to activate logging
 }
 
 /**
