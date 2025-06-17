@@ -512,21 +512,26 @@ export class Logger {
      */
     private updateLogLevel(e: ConfigurationChangeEvent) {
         if (e.affectsConfiguration(createCommand(PRIVACY))) {
-            const allowLogging = workspace.getConfiguration().get(`${EXTENSION_ID}.${PRIVACY}`) as boolean;
-            Logger.logLevel = allowLogging;
-            this.isActive = env.isTelemetryEnabled && Logger.logLevel;
-            if (allowLogging) {
-                const STORAGE_PROMPT = `${this.localContext.extension.id}${RESEARCH_PROMPT_SENT}`;
-                this.localContext.globalState.update(STORAGE_PROMPT, true);
-                if (this.uuid === UNREGISTERED) {
-                    this.setUUID(this.localContext); // Get the client ID first
-                } else {
-                    // start a new session
-                    this.updatePendingEvents();
-                }
-            }
+            const allowLogging = this.startLogging();
             window.showInformationMessage(`PyGuide research data logging ${allowLogging ? "turned on." : "turned off"}`);
         }
+    }
+
+    private startLogging() {
+        const allowLogging = workspace.getConfiguration().get(`${EXTENSION_ID}.${PRIVACY}`) as boolean;
+        Logger.logLevel = allowLogging;
+        this.isActive = env.isTelemetryEnabled && Logger.logLevel;
+        if (allowLogging) {
+            // const STORAGE_PROMPT = `${this.localContext.extension.id}${RESEARCH_PROMPT_SENT}`;
+            // this.localContext.globalState.update(STORAGE_PROMPT, true);
+            if (this.uuid === UNREGISTERED) {
+                this.setUUID(this.localContext); // Get the client ID first
+            } else {
+                // start a new session
+                this.updatePendingEvents();
+            }
+        }
+        return allowLogging;
     }
 
 

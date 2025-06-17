@@ -7,14 +7,12 @@ import { createAndShowWebview } from './webview';
 let disposables: Disposable[] = [];
 
 export async function activate(context: ExtensionContext) {
-	// debuggingOnlyClearAllStorage(context);
-
 	const logger = Logger.getInstance(context);
 
 	const sideDiagnostics = languages.createDiagnosticCollection("PyGuide");
 	const sideLens = new FeedbackLens(context);
 	subscribeToDocumentChanges(context, sideDiagnostics, sideLens, logger);
-	registerForResearchPrompt(context);
+	//registerForResearchPrompt(context);
 
 	disposables.push(
 		commands.registerCommand(createCommand(ENABLE), () => {

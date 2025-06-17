@@ -2,7 +2,7 @@
 
 Provides additional Python diagnostic messages aimed at beginners.
 
-The extension was created by researchers at the University of York. [Help us to make it better by participating in our research](https://supportive-ide.hosted.york.ac.uk/participate.html). Participation is anonymous. 
+The extension was created by researchers at the University of York. Usage data collection is enabled by default to help us improve the extension. You can disable data collection at any time in Settings. Search for PyGuide then untick the box next to "Allow a University of York research project to collect usage data". [Read about the project and the data we collect on our website](https://supportive-ide.hosted.york.ac.uk/participate.html). Data collection is anonymous. 
 
 ## Features
 
@@ -29,7 +29,7 @@ PyGuide requires the [Microsoft Python for VS Code](https://marketplace.visualst
 
 This extension contributes the following setting:
 
-* `pyguide.allowLogging`: Enable/disable usage data collection for this extension only. 
+* `pyguide.allowLogging`: Disable/enable usage data collection for this extension only. 
 * `pyguide.showCodeLens`: Show/hide a clickable feedback message above an issue in your code. If enabled, you can click the message to see extended feedback. If disabled, you can still access the extended feedback via the lightbulb menu or the Problems pane.
 
 ## Known Issues
@@ -37,6 +37,9 @@ This extension contributes the following setting:
 This extension can only detect issues that are task independent—it cannot detect logic errors or strategic errors that would require knowledge of what you are working on. It is intended for beginner programmers so may not work with more advanced concepts and syntax.
 
 ## Release Notes
+
+### 0.2.0
+The extension now collects usage data by default unless you disable it in Settings. [Read about the research project and the data we collect on our website](https://supportive-ide.hosted.york.ac.uk/participate.html)
 
 ### 0.1.0
 First release via the extension marketplace.
