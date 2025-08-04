@@ -36,7 +36,7 @@ export function refreshDiagnostics(doc: TextDocument,
         paramsMap.clear();
 
         // Check for misconceptions and feedback 
-        const result: SideLibResult = sideLib.feedback(doc.getText(), true);
+        const result: SideLibResult = sideLib.feedback(doc.getText(), true, {showConcepts: true});
 
         // Log all results
         sendToLog(doc, result, logger, changes, eventType);

@@ -63,6 +63,7 @@ export type DocInfo = {
     functions: UserDefinedFunction[],
     symptoms: Symptom[],
     misconceptions: Misconception[],
+    concepts: Misconception[],
     graph: Graph
 };
 

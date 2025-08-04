@@ -1,7 +1,7 @@
-import { ExtensionContext, workspace, env, ConfigurationChangeEvent, window, TextDocument, TextDocumentContentChangeEvent, ConfigurationTarget } from 'vscode';
+import { ExtensionContext, workspace, env, ConfigurationChangeEvent, window, TextDocument, TextDocumentContentChangeEvent, extensions } from 'vscode';
 import axios from 'axios';
 import { v4 as uuidV4 } from 'uuid';
-import { EXTENSION_ID, EventTypes, FEEDBACK_RECEIVED_FOR, PRIVACY, RESEARCH_PROMPT_SENT, UNREGISTERED, createCommand } from './utils';
+import { EXTENSION_ID, EXTENSION_PUBLISHER, EventTypes, FEEDBACK_RECEIVED_FOR, PRIVACY, RESEARCH_PROMPT_SENT, UNREGISTERED, createCommand } from './utils';
 import { API_URL } from './urls';
 import { Feedback, Misconception, SideLibResult } from './types';
 
@@ -184,6 +184,38 @@ class MisconceptionEvent extends AbstractEvent {
 }
 
 /**
+ * Describes a Concept
+ */
+class ConceptEvent extends AbstractEvent {
+    private conceptName: string;
+    private rawInfo: Misconception | {};
+
+    constructor(eventID: number, conceptName: string, rawInfo: Misconception | {}) {
+        super(`${eventID}-${conceptName}`);
+        this.conceptName = conceptName;
+        this.rawInfo = rawInfo;
+    }
+
+    getConceptName() {
+        return this.conceptName;
+    }
+
+    getRawInfo() {
+        return this.rawInfo;
+    }
+
+    toLogFormat(clientID: string, sessionID: string): {} {
+        return {
+            clientID, sessionID,
+            eventID: this.getEventID(),
+            conceptName: this.getConceptName(),
+            rawInfo: this.getRawInfo()
+        };
+    }
+
+}
+
+/**
  * Describes a Feedback object returned by SIDE-lib
  */
 class FeedbackEvent extends AbstractEvent {
@@ -251,6 +283,7 @@ class FileLog {
     private lastInteractionEvent: InteractionEvent | undefined;
     private interactionEvents: InteractionEvent[];
     private misconceptionEvents: MisconceptionEvent[];
+    private conceptEvents: ConceptEvent[];
     private feedbackEvents: FeedbackEvent[];
     private feedbackActionEvents: FeedbackActionEvent[];
 
@@ -259,6 +292,7 @@ class FileLog {
         this.sessionID = uuidV4();
         this.interactionEvents = [];
         this.misconceptionEvents = [];
+        this.conceptEvents = [];
         this.feedbackEvents = [];
         this.feedbackActionEvents = [];
         // Log new session
@@ -274,7 +308,9 @@ class FileLog {
     async startSession() {
         if (env.isTelemetryEnabled && workspace.getConfiguration().get(createCommand(PRIVACY)) as boolean) {
             try {
-                await axios.put(`${API_URL}/session`, { clientID: this.clientID, sessionID: this.sessionID});
+                const extConfig = extensions.getExtension(`${EXTENSION_PUBLISHER}.${EXTENSION_ID}`);
+                const versionNum = extConfig !== undefined ? extConfig.packageJSON.version : "";
+                await axios.put(`${API_URL}/session`, { clientID: this.clientID, sessionID: this.sessionID, extensionVersion: versionNum});
             } catch (error) {
                 console.log("PyGuide couldn't start a logging session:", error);
             }
@@ -318,6 +354,15 @@ class FileLog {
         this.misconceptionEvents.push(new MisconceptionEvent(eventID, misconceptionInfo.type, misconceptionInfo));
     }
 
+    /**
+     * Track a new detected concept
+     * @param eventID The ID of the event the concept is associated with
+     * @param conceptInfo Information about the concept
+     */
+    addConcept(eventID: number, conceptInfo: Misconception) {
+        this.conceptEvents.push(new ConceptEvent(eventID, conceptInfo.type, conceptInfo));
+    }
+
 
     /**
      * Track a feedback object returned by SIDE-lib
@@ -355,6 +400,15 @@ class FileLog {
      */
     getMisconceptionEvents() {
         return this.misconceptionEvents;
+    }
+
+
+    /**
+     * Get the concepts
+     * @returns All tracked concepts
+     */
+    getConceptEvents() {
+        return this.conceptEvents;
     }
 
 
@@ -403,7 +457,7 @@ class FileLog {
 
 
     /**
-     * Send all data to the database and update local tracking when a response is 
+     * Send all data (except concepts) to the database and update local tracking when a response is 
      * received e.g. remove events that have been successfully stored.
      */
     async checkAndSendData() {
@@ -439,6 +493,39 @@ class FileLog {
                 this.feedbackActionEvents = this.feedbackActionEvents.filter(event => updateAndKeep(event, response.savedActions, response.failedActions));
                 if (this.interactionEvents.length >= Logger.maxLogSize) {
                     this.checkAndSendData();
+                }
+            }
+        } catch (error) {
+            console.log("oops", error);
+        }
+    }
+
+
+    /**
+     * Send all concept data to the database and update local tracking when a response is 
+     * received e.g. remove events that have been successfully stored.
+     */
+    async checkAndSendConcepts() {
+        try {
+            const concepts = this.prepareToSend(this.conceptEvents);
+            if (concepts.length > 0 ) {
+                const response = (await axios.put(`${API_URL}/concepts`, { concepts})).data as {
+                    savedConcepts: string[], 
+                    failedConcepts: string[]
+                };
+                const updateAndKeep = (event: AbstractEvent, saved: string[], failed: string[]) => {
+                    if (saved.includes(event.getEventID())) {
+                        event.setSaveComplete();
+                        return false;
+                    } else if (failed.includes(event.getEventID()))  {
+                        event.setSaveFailed();
+                    }
+                    return true;
+                };
+
+                this.conceptEvents = this.conceptEvents.filter(event => updateAndKeep(event, response.savedConcepts, response.failedConcepts));
+                if (this.conceptEvents.length >= Logger.maxLogSize) {
+                    this.checkAndSendConcepts();
                 }
             }
         } catch (error) {
@@ -581,12 +668,16 @@ export class Logger {
                     for (const miscon of sideLibResult.parse.misconceptions) {
                         currentLog.addMisconception(eventID, miscon);
                     } 
+                    for (const concept of sideLibResult.parse.concepts) {
+                        currentLog.addConcept(eventID, concept);
+                    }
                     for (const feedback of sideLibResult.feedback) {
                         currentLog.addFeedback(eventID, feedback);
                     }
                 }
                 if (this.logIsReady(currentLog)) {
                     currentLog.checkAndSendData();
+                    currentLog.checkAndSendConcepts();
                 }
             }
         }
@@ -610,6 +701,7 @@ export class Logger {
                 currentLog.addFeedbackAction(eventID, params, source);
                 if (this.logIsReady(currentLog)) {
                     currentLog.checkAndSendData();
+                    currentLog.checkAndSendConcepts();
                 }
             }
         }
