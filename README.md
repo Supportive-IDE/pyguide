@@ -38,6 +38,11 @@ This extension can only detect issues that are task independent—it cannot dete
 
 ## Release Notes
 
+### 0.3.0
+Fixes a bug where valid use of the walrus operator was identified as a possible misconception. 
+
+The extension also now collects data on usage of specific concepts (e.g. writing a valid assignment status). This will enable the researchers to determine if providing feedback on specific misconceptions helps users to correct the underlying issue.
+
 ### 0.2.0
 The extension now collects usage data by default unless you disable it in Settings. [Read about the research project and the data we collect on our website](https://supportive-ide.hosted.york.ac.uk/participate.html)
 
