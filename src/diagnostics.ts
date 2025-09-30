@@ -34,7 +34,6 @@ export function refreshDiagnostics(doc: TextDocument,
         const diagnostics: Diagnostic[] = [];
         const codeLenses: CodeLens[] = [];
         paramsMap.clear();
-
         // Check for misconceptions and feedback 
         const result: SideLibResult = sideLib.feedback(doc.getText(), true, {showConcepts: true});
 
@@ -141,6 +140,7 @@ function createDiagnostic(feedback: Feedback, start: Position, end: Position, do
  */
 export function subscribeToDocumentChanges(context: ExtensionContext, sideDiagnostics: DiagnosticCollection, sideLens: FeedbackLens, logger: Logger): void {
 	if (window.activeTextEditor) {
+        console.log("Initial diagnostic refresh", window.activeTextEditor.document.fileName);
         refreshDiagnostics(window.activeTextEditor.document, 
                            sideDiagnostics, sideLens,
                            logger);
@@ -148,6 +148,7 @@ export function subscribeToDocumentChanges(context: ExtensionContext, sideDiagno
 	context.subscriptions.push(
 		window.onDidChangeActiveTextEditor(editor => {
 			if (editor) {
+                console.log("Active editor changed - refreshing diagnostics", editor.document.fileName);
                 refreshDiagnostics(editor.document, sideDiagnostics, sideLens, logger);
 			}
 		})
@@ -155,19 +156,22 @@ export function subscribeToDocumentChanges(context: ExtensionContext, sideDiagno
 
 	context.subscriptions.push(
 		workspace.onDidChangeTextDocument(e => {
+            console.log("Document changed - refreshing diagnostics", e.document.fileName);
             refreshDiagnostics(e.document, sideDiagnostics, sideLens, logger, e.contentChanges); // Done
 }       )
 	);
 
 	context.subscriptions.push(
 		workspace.onDidCloseTextDocument(doc => {
+            console.log("Document closed - clearing diagnostics", doc.fileName);
             sideDiagnostics.delete(doc.uri);
-            refreshDiagnostics(doc, sideDiagnostics, sideLens, logger, [], EventTypes.close);
+            //refreshDiagnostics(doc, sideDiagnostics, sideLens, logger, [], EventTypes.close);
         })
 	);
 
     context.subscriptions.push(
         workspace.onDidSaveTextDocument(doc => {
+            console.log("Document saved - refreshing diagnostics", doc.fileName);
             refreshDiagnostics(doc, sideDiagnostics, sideLens, logger, [], EventTypes.save);
         }),
     );
