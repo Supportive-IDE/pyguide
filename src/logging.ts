@@ -3,7 +3,7 @@ import axios from 'axios';
 import { v4 as uuidV4 } from 'uuid';
 import { EXTENSION_ID, EXTENSION_PUBLISHER, EventTypes, FEEDBACK_RECEIVED_FOR, PRIVACY, RESEARCH_PROMPT_SENT, UNREGISTERED, createCommand } from './utils';
 import { API_URL } from './urls';
-import { Feedback, Misconception, SideLibResult } from './types';
+import { Feedback, Misconception, MisconceptionOccurrence, SideLibResult } from './types';
 
 
 /**
@@ -27,16 +27,23 @@ enum RegistrationStatus {
 
 //#region Events
 abstract class AbstractEvent {
-    private eventID: string;
+    private eventID: number;
+    private uniqueID: string;
     private logStatus: Status;
+    private failedAttempts: number = 0;
 
-    constructor(eventID: string) {
+    constructor(eventID: number, uniqueID: string) {
         this.eventID = eventID;
+        this.uniqueID = uniqueID;
         this.logStatus = Status.ready;
     }
 
     getEventID() {
         return this.eventID;
+    }
+
+    getUniqueID() {
+        return this.uniqueID;
     }
 
     getLogStatus() {
@@ -52,10 +59,15 @@ abstract class AbstractEvent {
     }
 
     setSaveFailed() {
-        this.logStatus = Status.ready;
+        this.failedAttempts += 1;
+        if (this.failedAttempts >= 3) {
+            this.logStatus = Status.complete; // give up after 3 failed attempts
+        } else {
+            this.logStatus = Status.ready;
+        }
     }
 
-    abstract toLogFormat(clientID: string, sessionID: string): {[key: string]: string};
+    abstract toLogFormat(clientID: string, sessionID: string): {[key: string]: string | string[] | number[]};
 
 }
 
@@ -75,7 +87,7 @@ class InteractionEvent extends AbstractEvent {
         changes: readonly TextDocumentContentChangeEvent[], 
         time: number
     ) {
-        super(eventID.toString());
+        super(eventID, eventID.toString());
         this.eventType = eventType;
         this.timeStamp = time;
         this.fullText = afterTextRaw;
@@ -140,6 +152,7 @@ class InteractionEvent extends AbstractEvent {
     public toLogFormat(clientID: string, sessionID: string): {} {
         return {
             clientID, sessionID,
+            uniqueID: this.getUniqueID(),
             eventID: this.getEventID(),
             eventType: this.getEventType(),
             insertSize: this.getInsertText().length,
@@ -154,66 +167,139 @@ class InteractionEvent extends AbstractEvent {
 /**
  * Describes a Misconception
  */
-class MisconceptionEvent extends AbstractEvent {
-    private misconceptionName: string;
-    private rawInfo: Misconception | {};
+// class MisconceptionEvent extends AbstractEvent {
+//     private misconceptionName: string;
+//     private rawInfo: Misconception | {};
 
-    constructor(eventID: number, misconceptionName: string, rawInfo: Misconception | {}) {
-        super(`${eventID}-${misconceptionName}`);
+//     constructor(eventID: number, misconceptionName: string, rawInfo: Misconception | {}) {
+//         super(eventID, `${eventID}-${misconceptionName}`);
+//         this.misconceptionName = misconceptionName;
+//         this.rawInfo = rawInfo;
+//     }
+
+//     getMisconceptionName() {
+//         return this.misconceptionName;
+//     }
+
+//     getRawInfo() {
+//         return this.rawInfo;
+//     }
+
+//     toLogFormat(clientID: string, sessionID: string): {} {
+//         return {
+//             clientID, sessionID,
+//             uniqueID: this.getUniqueID(),
+//             eventID: this.getEventID(),
+//             misconceptionName: this.getMisconceptionName(),
+//             rawInfo: this.getRawInfo()
+//         };
+//     }
+
+// }
+
+/**
+ * Describes a misconception occurrence following the V2 format (as of 11/12/2025)
+ * Also describes a concept occurrence in the V2 format
+ */
+class MisconceptionV2Event extends AbstractEvent {
+    private misconceptionName: string;
+    private occurrence: number;
+    private symptomNames: string[];
+    private symptomBlocks: string[];
+    private symptomDocIndices: number[];
+    private symptomTexts: string[];
+
+    constructor(eventID: number, misconceptionName: string, occId: number, occ: MisconceptionOccurrence) {
+        super(eventID, `${eventID}-${misconceptionName}-${occId}`);
         this.misconceptionName = misconceptionName;
-        this.rawInfo = rawInfo;
+        this.occurrence = occId;
+        this.symptomNames = [];
+        this.symptomBlocks = [];
+        this.symptomDocIndices = [];
+        this.symptomTexts = [];
+        this.#populate(occ);
+    }
+
+    #populate(occ: MisconceptionOccurrence) {
+        for (const symptom of occ.reason.contributingSymptoms) {
+            this.symptomNames.push(symptom.type);
+            this.symptomBlocks.push(symptom.block);
+            this.symptomDocIndices.push(symptom.docIndex);
+            this.symptomTexts.push(symptom.text);
+        }
     }
 
     getMisconceptionName() {
         return this.misconceptionName;
     }
 
-    getRawInfo() {
-        return this.rawInfo;
+    getOccurrence() {
+        return this.occurrence;
+    }
+
+    getSymptomNames() {
+        return this.symptomNames;
+    }
+
+    getSymptomBlocks() {
+        return this.symptomBlocks;
+    }
+
+    getSymptomDocIndices() {
+        return this.symptomDocIndices;
+    }
+
+    getSymptomTexts() {
+        return this.symptomTexts;
     }
 
     toLogFormat(clientID: string, sessionID: string): {} {
         return {
             clientID, sessionID,
+            uniqueID: this.getUniqueID(),
             eventID: this.getEventID(),
             misconceptionName: this.getMisconceptionName(),
-            rawInfo: this.getRawInfo()
+            occurrence: this.getOccurrence(),
+            symptomNames: this.getSymptomNames(),
+            symptomBlocks: this.getSymptomBlocks(),
+            symptomDocIndices: this.getSymptomDocIndices(),
+            symptomTexts: this.getSymptomTexts()
         };
     }
-
 }
 
 /**
- * Describes a Concept
+ * Describes a Concept. No longer needed in V2 format but kept for backwards compatibility.
  */
-class ConceptEvent extends AbstractEvent {
-    private conceptName: string;
-    private rawInfo: Misconception | {};
+// class ConceptEvent extends AbstractEvent {
+//     private conceptName: string;
+//     private rawInfo: Misconception | {};
 
-    constructor(eventID: number, conceptName: string, rawInfo: Misconception | {}) {
-        super(`${eventID}-${conceptName}`);
-        this.conceptName = conceptName;
-        this.rawInfo = rawInfo;
-    }
+//     constructor(eventID: number, conceptName: string, rawInfo: Misconception | {}) {
+//         super(eventID, `${eventID}-${conceptName}`);
+//         this.conceptName = conceptName;
+//         this.rawInfo = rawInfo;
+//     }
 
-    getConceptName() {
-        return this.conceptName;
-    }
+//     getConceptName() {
+//         return this.conceptName;
+//     }
 
-    getRawInfo() {
-        return this.rawInfo;
-    }
+//     getRawInfo() {
+//         return this.rawInfo;
+//     }
 
-    toLogFormat(clientID: string, sessionID: string): {} {
-        return {
-            clientID, sessionID,
-            eventID: this.getEventID(),
-            conceptName: this.getConceptName(),
-            rawInfo: this.getRawInfo()
-        };
-    }
+//     toLogFormat(clientID: string, sessionID: string): {} {
+//         return {
+//             clientID, sessionID,
+//             uniqueID: this.getUniqueID(),
+//             eventID: this.getEventID(),
+//             conceptName: this.getConceptName(),
+//             rawInfo: this.getRawInfo()
+//         };
+//     }
 
-}
+// }
 
 /**
  * Describes a Feedback object returned by SIDE-lib
@@ -226,7 +312,7 @@ class FeedbackEvent extends AbstractEvent {
     private extendedFeedbackParams: string;
 
     constructor (eventID: number, misconceptionName: string, docIndex: number, affectedText: string, firstMessage: string, extendedFeedbackParams: string) {
-        super(`${eventID}-${misconceptionName}-${docIndex}`);
+        super(eventID, `${eventID}-${misconceptionName}-${docIndex}`);
         this.misconceptionName = misconceptionName;
         this.docIndex = docIndex;
         this.affectedText = affectedText;
@@ -237,6 +323,7 @@ class FeedbackEvent extends AbstractEvent {
     toLogFormat(clientID: string, sessionID: string): {} {
         return {
             clientID, sessionID,
+            uniqueID: this.getUniqueID(),
             eventID: this.getEventID(),
             misconceptionName: this.misconceptionName,
             docIndex: this.docIndex,
@@ -256,7 +343,7 @@ class FeedbackActionEvent extends AbstractEvent {
     private type: string;
 
     constructor(eventID: number, extendedFeedbackParams: string, actionType: string) {
-        super(eventID.toString());
+        super(eventID, eventID.toString());
         this.extendedFeedbackParams = extendedFeedbackParams;
         this.type = actionType;
     }
@@ -264,6 +351,7 @@ class FeedbackActionEvent extends AbstractEvent {
     toLogFormat(clientID: string, sessionID: string): {} {
         return {
             clientID, sessionID,
+            uniqueID: this.getUniqueID(),
             eventID: this.getEventID(),
             extendedFeedbackParams: this.extendedFeedbackParams,
             type: this.type
@@ -282,8 +370,8 @@ class FileLog {
     private sessionID: string;
     private lastInteractionEvent: InteractionEvent | undefined;
     private interactionEvents: InteractionEvent[];
-    private misconceptionEvents: MisconceptionEvent[];
-    private conceptEvents: ConceptEvent[];
+    private misconceptionV2Events: MisconceptionV2Event[];
+    private conceptV2Events: MisconceptionV2Event[];
     private feedbackEvents: FeedbackEvent[];
     private feedbackActionEvents: FeedbackActionEvent[];
 
@@ -291,8 +379,8 @@ class FileLog {
         this.clientID = clientID;
         this.sessionID = uuidV4();
         this.interactionEvents = [];
-        this.misconceptionEvents = [];
-        this.conceptEvents = [];
+        this.misconceptionV2Events = [];
+        this.conceptV2Events = [];
         this.feedbackEvents = [];
         this.feedbackActionEvents = [];
         // Log new session
@@ -310,7 +398,7 @@ class FileLog {
             try {
                 const extConfig = extensions.getExtension(`${EXTENSION_PUBLISHER}.${EXTENSION_ID}`);
                 const versionNum = extConfig !== undefined ? extConfig.packageJSON.version : "";
-                await axios.put(`${API_URL}/session`, { clientID: this.clientID, sessionID: this.sessionID, extensionVersion: versionNum});
+                await axios.put(`${API_URL}/sessionV2`, { clientID: this.clientID, sessionID: this.sessionID, extensionVersion: versionNum});
             } catch (error) {
                 console.log("PyGuide couldn't start a logging session:", error);
             }
@@ -329,7 +417,7 @@ class FileLog {
     addInteraction(docText: string, changes: readonly TextDocumentContentChangeEvent[], 
                     time: number, possibleEventType: EventTypes | undefined) {
         // EventID (work out), EventType (work out), Text (pass in), EditLocation (pass in?), Timestamp (pass in?)
-        const eventID = this.lastInteractionEvent ? Number.parseInt(this.lastInteractionEvent.getEventID()) + 1 : 0; 
+        const eventID = this.lastInteractionEvent ? this.lastInteractionEvent.getEventID() + 1 : 0; 
         // Either the passed in event type (save / close, or open if this is the first event, or insert or delete)
         if (possibleEventType === undefined && this.lastInteractionEvent !== undefined && changes.length === 0) {
             // not a loggable event - duplicate open usually
@@ -344,23 +432,27 @@ class FileLog {
         return eventID;
     }
 
-
     /**
-     * Track a new detected misconception
+     * Track a new detected misconception (V2 format)
      * @param eventID The ID of the event the misconception is associated with
      * @param misconceptionInfo Information about the misconception
      */
-    addMisconception(eventID: number, misconceptionInfo: Misconception) {
-        this.misconceptionEvents.push(new MisconceptionEvent(eventID, misconceptionInfo.type, misconceptionInfo));
+    addMisconceptionV2(eventID: number, misconceptionInfo: Misconception) {
+        for (const [occId, occ] of misconceptionInfo.occurrences.entries()) {
+            this.misconceptionV2Events.push(new MisconceptionV2Event(eventID, misconceptionInfo.type, occId, occ));
+        }
     }
 
-    /**
-     * Track a new detected concept
+
+    /**     
+     * Track a new detected concept (V2 format)
      * @param eventID The ID of the event the concept is associated with
      * @param conceptInfo Information about the concept
      */
-    addConcept(eventID: number, conceptInfo: Misconception) {
-        this.conceptEvents.push(new ConceptEvent(eventID, conceptInfo.type, conceptInfo));
+    addConceptV2(eventID: number, conceptInfo: Misconception) {
+        for (const [occId, occ] of conceptInfo.occurrences.entries()) {
+            this.conceptV2Events.push(new MisconceptionV2Event(eventID, conceptInfo.type, occId, occ));
+        }
     }
 
 
@@ -399,16 +491,7 @@ class FileLog {
      * @returns All tracked misconceptions
      */
     getMisconceptionEvents() {
-        return this.misconceptionEvents;
-    }
-
-
-    /**
-     * Get the concepts
-     * @returns All tracked concepts
-     */
-    getConceptEvents() {
-        return this.conceptEvents;
+        return this.misconceptionV2Events;
     }
 
 
@@ -457,17 +540,19 @@ class FileLog {
 
 
     /**
+     * UPDATE FOR V2 LOGGING
      * Send all data (except concepts) to the database and update local tracking when a response is 
      * received e.g. remove events that have been successfully stored.
      */
     async checkAndSendData() {
         try {
             const interactions = this.prepareToSend(this.interactionEvents);
-            const misconceptions = this.prepareToSend(this.misconceptionEvents);
+            const misconceptions = this.prepareToSend(this.misconceptionV2Events);
             const feedback = this.prepareToSend(this.feedbackEvents);
             const feedbackActions = this.prepareToSend(this.feedbackActionEvents);
-            if (interactions.length > 0 || misconceptions.length > 0 || feedback.length > 0 || feedbackActions.length > 0) {
-                const response = (await axios.put(`${API_URL}/store`, { interactions, misconceptions, feedback, feedbackActions})).data as {
+            const concepts = this.prepareToSend(this.conceptV2Events);
+            if (interactions.length > 0 || misconceptions.length > 0 || feedback.length > 0 || feedbackActions.length > 0 || concepts.length > 0) {
+                const response = (await axios.put(`${API_URL}/storeV2`, { interactions, misconceptions, feedback, feedbackActions, concepts})).data as {
                     savedEdits: string[], 
                     failedEdits: string[], 
                     savedMisconceptions: string[], 
@@ -475,23 +560,29 @@ class FileLog {
                     savedFeedback: string[], 
                     failedFeedback: string[],
                     savedActions: string[],
-                    failedActions: string[]
+                    failedActions: string[],
+                    savedConcepts: string[],
+                    failedConcepts: string[]
                 };
                 const updateAndKeep = (event: AbstractEvent, saved: string[], failed: string[]) => {
-                    if (saved.includes(event.getEventID())) {
+                    if (saved.includes(event.getUniqueID())) {
                         event.setSaveComplete();
                         return false;
-                    } else if (failed.includes(event.getEventID()))  {
+                    } else if (failed.includes(event.getUniqueID()))  {
                         event.setSaveFailed();
+                        if (event.getLogStatus() === Status.complete) {
+                            return false;
+                        }
                     }
                     return true;
                 };
 
                 this.interactionEvents = this.interactionEvents.filter(event => updateAndKeep(event, response.savedEdits, response.failedEdits));
-                this.misconceptionEvents = this.misconceptionEvents.filter(event => updateAndKeep(event, response.savedMisconceptions, response.failedMisconceptions));
+                this.misconceptionV2Events = this.misconceptionV2Events.filter(event => updateAndKeep(event, response.savedMisconceptions, response.failedMisconceptions));
                 this.feedbackEvents = this.feedbackEvents.filter(event => updateAndKeep(event, response.savedFeedback, response.failedFeedback));
                 this.feedbackActionEvents = this.feedbackActionEvents.filter(event => updateAndKeep(event, response.savedActions, response.failedActions));
-                if (this.interactionEvents.length >= Logger.maxLogSize) {
+                this.conceptV2Events = this.conceptV2Events.filter(event => updateAndKeep(event, response.savedConcepts, response.failedConcepts));
+                if (this.interactionEvents.length >= Logger.maxLogSize || this.conceptV2Events.length >= Logger.maxLogSize) {
                     this.checkAndSendData();
                 }
             }
@@ -502,36 +593,40 @@ class FileLog {
 
 
     /**
+     * DEPRECATED
      * Send all concept data to the database and update local tracking when a response is 
      * received e.g. remove events that have been successfully stored.
      */
-    async checkAndSendConcepts() {
-        try {
-            const concepts = this.prepareToSend(this.conceptEvents);
-            if (concepts.length > 0 ) {
-                const response = (await axios.put(`${API_URL}/concepts`, { concepts})).data as {
-                    savedConcepts: string[], 
-                    failedConcepts: string[]
-                };
-                const updateAndKeep = (event: AbstractEvent, saved: string[], failed: string[]) => {
-                    if (saved.includes(event.getEventID())) {
-                        event.setSaveComplete();
-                        return false;
-                    } else if (failed.includes(event.getEventID()))  {
-                        event.setSaveFailed();
-                    }
-                    return true;
-                };
+    // async checkAndSendConcepts() {
+    //     try {
+    //         const concepts = this.prepareToSend(this.conceptEvents);
+    //         if (concepts.length > 0 ) {
+    //             const response = (await axios.put(`${API_URL}/concepts`, { concepts})).data as {
+    //                 savedConcepts: string[], 
+    //                 failedConcepts: string[]
+    //             };
+    //             const updateAndKeep = (event: AbstractEvent, saved: string[], failed: string[]) => {
+    //                 if (saved.includes(event.getUniqueID())) {
+    //                     event.setSaveComplete();
+    //                     return false;
+    //                 } else if (failed.includes(event.getUniqueID()))  {
+    //                     event.setSaveFailed();
+    //                     if (event.getLogStatus() === Status.complete) {
+    //                         return false;
+    //                     }
+    //                 }
+    //                 return true;
+    //             };
 
-                this.conceptEvents = this.conceptEvents.filter(event => updateAndKeep(event, response.savedConcepts, response.failedConcepts));
-                if (this.conceptEvents.length >= Logger.maxLogSize) {
-                    this.checkAndSendConcepts();
-                }
-            }
-        } catch (error) {
-            console.log("oops", error);
-        }
-    }
+    //             this.conceptEvents = this.conceptEvents.filter(event => updateAndKeep(event, response.savedConcepts, response.failedConcepts));
+    //             if (this.conceptEvents.length >= Logger.maxLogSize) {
+    //                 this.checkAndSendConcepts();
+    //             }
+    //         }
+    //     } catch (error) {
+    //         console.log("oops", error);
+    //     }
+    // }
 
 }
 
@@ -540,11 +635,12 @@ class FileLog {
  * The logging controller
  */
 export class Logger {
-    static maxLogSize = 10;
+    static maxLogSize = 100;
     private static instance: Logger;
     private uuid: string | undefined;
     private fileIDs: Map<string, FileLog>;
     private isActive: boolean; // The extension log permission is granted AND telemetry is enabled overall
+    private isDebugMode: boolean; // Allows inspection of log processes but doesn't log to db
     private localContext: ExtensionContext;
     private static logLevel: boolean;
     private static registrationStatus: number = RegistrationStatus.idPending;
@@ -557,6 +653,7 @@ export class Logger {
 
         // Check user settings for telemetry (only log if it is enabled and logLevel is higher than none)
         this.isActive = env.isTelemetryEnabled && Logger.logLevel;
+        this.isDebugMode = false;
 
         this.fileIDs = new Map();
 
@@ -608,7 +705,7 @@ export class Logger {
         const allowLogging = workspace.getConfiguration().get(`${EXTENSION_ID}.${PRIVACY}`) as boolean;
         Logger.logLevel = allowLogging;
         this.isActive = env.isTelemetryEnabled && Logger.logLevel;
-        if (allowLogging) {
+        if (allowLogging || this.isDebugMode) {
             // const STORAGE_PROMPT = `${this.localContext.extension.id}${RESEARCH_PROMPT_SENT}`;
             // this.localContext.globalState.update(STORAGE_PROMPT, true);
             if (this.uuid === UNREGISTERED) {
@@ -647,7 +744,7 @@ export class Logger {
                 sideLibResult: SideLibResult, eventType: EventTypes | undefined
     ) {
         // Logger.feedbackRequester.checkAndRequest(); // initiate feedback request, if it's time
-        if (this.isActive && Logger.registrationStatus !== RegistrationStatus.idRefused) {
+        if (this.isDebugMode || (this.isActive && Logger.registrationStatus !== RegistrationStatus.idRefused)) {
             if (!this.fileIDs.has(doc.fileName)) {
                 this.fileIDs.set(doc.fileName, new FileLog(this.uuid ? this.uuid : UNREGISTERED));
             }    
@@ -666,18 +763,20 @@ export class Logger {
                 // Add misconception and feedback if detected
                 if (eventID > -1) {
                     for (const miscon of sideLibResult.parse.misconceptions) {
-                        currentLog.addMisconception(eventID, miscon);
+                        currentLog.addMisconceptionV2(eventID, miscon);
                     } 
                     for (const concept of sideLibResult.parse.concepts) {
-                        currentLog.addConcept(eventID, concept);
+                        currentLog.addConceptV2(eventID, concept);
                     }
                     for (const feedback of sideLibResult.feedback) {
                         currentLog.addFeedback(eventID, feedback);
                     }
                 }
-                if (this.logIsReady(currentLog)) {
-                    currentLog.checkAndSendData();
-                    currentLog.checkAndSendConcepts();
+                if (!this.isDebugMode) {
+                    if (this.logIsReady(currentLog)) {
+                        currentLog.checkAndSendData();
+                        // currentLog.checkAndSendConcepts();
+                    }
                 }
             }
         }
@@ -690,7 +789,7 @@ export class Logger {
      * @param source The source of the action e.g. code action, diagnostics, code lens
      */
     public logAction(params: string, fileName: string, source: string) {
-        if (this.isActive && Logger.registrationStatus !== RegistrationStatus.idRefused) {
+        if (this.isDebugMode || (this.isActive && Logger.registrationStatus !== RegistrationStatus.idRefused)) {
             if (!this.fileIDs.has(fileName)) {
                 this.fileIDs.set(fileName, new FileLog(this.uuid ? this.uuid : UNREGISTERED));
             }
@@ -699,9 +798,11 @@ export class Logger {
             if (currentLog) {
                 const eventID = currentLog.addInteraction("", [], time, EventTypes.action);
                 currentLog.addFeedbackAction(eventID, params, source);
-                if (this.logIsReady(currentLog)) {
-                    currentLog.checkAndSendData();
-                    currentLog.checkAndSendConcepts();
+                if (!this.isDebugMode) {
+                    if (this.logIsReady(currentLog)) {
+                        currentLog.checkAndSendData();
+                        //currentLog.checkAndSendConcepts();
+                    }
                 }
             }
         }
@@ -737,10 +838,9 @@ export class Logger {
      */
     private logIsReady(fileLog: FileLog) {
         return Logger.registrationStatus === RegistrationStatus.idReceived
-                && (fileLog.getInteractionEvents().length >= Logger.maxLogSize
-                || fileLog.getMisconceptionEvents().length >= Logger.maxLogSize
-                || fileLog.getFeedbackEvents().length >= Logger.maxLogSize
-                || fileLog.getFeedbackActionEvents().length >= Logger.maxLogSize);
+                && (fileLog.getInteractionEvents().length + fileLog.getMisconceptionEvents().length 
+                + fileLog.getFeedbackEvents().length + fileLog.getFeedbackActionEvents().length 
+                >= Logger.maxLogSize);
     }
 
 
