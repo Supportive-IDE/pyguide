@@ -38,6 +38,9 @@ This extension can only detect issues that are task independent—it cannot dete
 
 ## Release Notes
 
+### 0.4.0
+Improved logging to prevent the extension from slowing with extended use.
+
 ### 0.3.1 and 0.3.2
 Fixed a bug where code lens messages remained in the editor when switching tabs or closing a file.
 
