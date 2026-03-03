@@ -6,20 +6,22 @@ The extension was created by researchers at the University of York. Usage data c
 
 ## Features
 
-PyGuide detects code issues that may indicate a misunderstanding of a concept or syntax, or a simple typo. Detected issues are underlined, just like other issues picked up by VSCode. By default, some quick feedback is displayed over underlined code. Click the message to open more detailed guidance.
+PyGuide detects code issues that may indicate a misunderstanding of a concept or syntax, or a simple typo. To check for issues, click the PyGuide button in the status bar.
+
+![The PyGuide button can be found in the status bar](images/button.png)
+
+Detected issues will be underlined, just like other issues picked up by VSCode. Some quick feedback is displayed over underlined code. Click the message to open more detailed guidance. 
 
 ![A brief feedback message is displayed over underlined code](images/codelens.png)
 
-If the "showCodeLens" setting is disabled, hover over underlined code to get some quick feedback.
-
-![Hover over underlined code to see a brief feedback message](images/hover.gif)
-
-Click the action in the lightbulb menu to open more detailed guidance.
-
-![Click the action in the lightbulb menu to open more detailed guidance in your browser](images/lightbulb.gif)
-
-You can also view detected issues in the Problems tab of your Terminal.
+After clicking the PyGuide button, you can also view detected issues in the Problems tab of your Terminal.
 ![Detected issues are listed in the problems pane in the terminal](images/problems.png)
+
+Note: all feedback will disappear if the file is edited or you switch to a different editor.
+
+### Enable "live" feedback
+
+By default, PyGuide feedback will only be shown when you click the button to request it. You can enable live feedback—-detected issues will be highlighted as you type--by going to settings, searching for "PyGuide", and enabling "Show Code Lens".
 
 ## Requirements
 
@@ -27,16 +29,19 @@ PyGuide requires the [Microsoft Python for VS Code](https://marketplace.visualst
 
 ## Extension Settings
 
-This extension contributes the following setting:
+This extension contributes the following settings:
 
 * `pyguide.allowLogging`: Disable/enable usage data collection for this extension only. 
-* `pyguide.showCodeLens`: Show/hide a clickable feedback message above an issue in your code. If enabled, you can click the message to see extended feedback. If disabled, you can still access the extended feedback via the lightbulb menu or the Problems pane.
+* `pyguide.showCodeLens`: Enable / disable live issue detection. If disabled, you can manually check for issues by pressing the PyGuide button in the status bar.
 
 ## Known Issues
 
 This extension can only detect issues that are task independent—it cannot detect logic errors or strategic errors that would require knowledge of what you are working on. It is intended for beginner programmers so may not work with more advanced concepts and syntax.
 
 ## Release Notes
+
+### 0.5.0
+Major change to feedback presentation. By default, feedback is no longer provided in real-time as you type. Instead, press the PyGuide button to check for issues. If you prefer real-time feedback, you can enable it via the settings described above.
 
 ### 0.4.0
 Improved logging to prevent the extension from slowing with extended use.

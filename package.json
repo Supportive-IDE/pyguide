@@ -4,7 +4,7 @@
   "publisher": "supportive-ide",
   "description": "Provides additional diagnostics for common Python misconceptions",
   "icon": "images/icon.png",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "license": "MIT",
   "repository": "https://github.com/Supportive-IDE/pyguide",
   "engines": {
@@ -47,7 +47,7 @@
         "pyguide.showCodeLens": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "Display feedback messages in the code. If this is not ticked, only diagnostics (underlines) will be shown.",
+          "markdownDescription": "Display feedback messages and diagnostics in the code. If this is disabled, feedback can be requested by clicking the PyGuide status bar button.",
           "tags":["help", "guidance", "configuration"]
         }
       }
