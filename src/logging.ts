@@ -1,9 +1,10 @@
-import { ExtensionContext, workspace, env, ConfigurationChangeEvent, window, TextDocument, TextDocumentContentChangeEvent, extensions } from 'vscode';
+import { ExtensionContext, workspace, env, ConfigurationChangeEvent, window, TextDocument, TextDocumentContentChangeEvent, extensions, ConfigurationTarget } from 'vscode';
 import axios from 'axios';
 import { v4 as uuidV4 } from 'uuid';
-import { EXTENSION_ID, EXTENSION_PUBLISHER, EventTypes, FEEDBACK_RECEIVED_FOR, PRIVACY, RESEARCH_PROMPT_SENT, UNREGISTERED, createCommand } from './utils';
+import { EXTENSION_ID, EXTENSION_PUBLISHER, EventTypes, FEEDBACK_RECEIVED_FOR, PRIVACY, RESEARCH_PROMPT_SENT, SHOW_CODE_LENS, UNREGISTERED, createCommand } from './utils';
 import { API_URL } from './urls';
 import { Feedback, Misconception, MisconceptionOccurrence, SideLibResult } from './types';
+import { timeStamp } from 'console';
 
 
 /**
@@ -94,7 +95,7 @@ class InteractionEvent extends AbstractEvent {
         if (eventType === EventTypes.open) {
             this.insertText = this.fullText;
             this.editLocation = 0;
-        } else if (eventType === EventTypes.save || eventType === EventTypes.close || eventType === EventTypes.action) {
+        } else if (eventType === EventTypes.save || eventType === EventTypes.close || eventType === EventTypes.action || eventType === EventTypes.request) {
             this.editLocation = 0;
         }
         else {
@@ -545,6 +546,8 @@ class FileLog {
      * received e.g. remove events that have been successfully stored.
      */
     async checkAndSendData() {
+        // TEMP!!!!
+        // this.TESTcheckAndSendData();
         try {
             const interactions = this.prepareToSend(this.interactionEvents);
             const misconceptions = this.prepareToSend(this.misconceptionV2Events);
@@ -585,6 +588,24 @@ class FileLog {
                 if (this.interactionEvents.length >= Logger.maxLogSize || this.conceptV2Events.length >= Logger.maxLogSize) {
                     this.checkAndSendData();
                 }
+            }
+        } catch (error) {
+            console.log("oops", error);
+        }
+    }
+
+    async TESTcheckAndSendData() {
+        console.log("TESTING LOG SEND");
+        try {
+            const interactions = this.prepareToSend(this.interactionEvents);
+            // const misconceptions = this.prepareToSend(this.misconceptionV2Events);
+            // const feedback = this.prepareToSend(this.feedbackEvents);
+            // const feedbackActions = this.prepareToSend(this.feedbackActionEvents);
+            // const concepts = this.prepareToSend(this.conceptV2Events);
+            if (interactions.length > 0) {
+                const response = (await axios.put(`${API_URL}/testmulti`, { interactions}));
+                console.log(response.status === 200 ? "Test log send successful!" : "Test log send failed!");
+                
             }
         } catch (error) {
             console.log("oops", error);
@@ -825,7 +846,20 @@ export class Logger {
                 comments
             });
         } catch (error) {
-            console.log("PyGuide couldn't start a logging session:", error);
+            console.log("PyGuide couldn't log user feedback:", error);
+        }
+    }
+
+    public async logSettingsChange(settingName: string, newValue: string) {
+        try {
+            await axios.put(`${API_URL}/settings`, {
+                clientID: this.uuid,
+                timestamp: Date.now(),
+                setting: settingName,
+                value: newValue
+            });
+        } catch (error) {
+            console.log("PyGuide couldn't log settings change:", error);
         }
     }
 
@@ -867,12 +901,15 @@ export class Logger {
     private async setUUID(context: ExtensionContext) {
         const STORAGE_KEY = `${context.extension.id}_UUID`;
 
+        
         // For debugging only!
         // await context.globalState.update(STORAGE_KEY, undefined);
 
         let uuid: string | undefined = context.globalState.get(STORAGE_KEY);
         if (!context.globalState.get(STORAGE_KEY) && this.isActive) {
             Logger.registrationStatus = RegistrationStatus.idPending;
+            // For v0.5.0 - set code lens setting to false by default (unregistered users only)
+            this.disableLiveDiagnostics();
             try {
                 uuid = await this.registerWithDB();
                 if (uuid !== UNREGISTERED) {
@@ -895,6 +932,21 @@ export class Logger {
             Logger.registrationStatus = RegistrationStatus.idRefused;
         }
         console.log("PyGuide UUID:", this.uuid);
+    }
+
+    /**
+     * Disable live SIDElib diagnostics.
+     */
+    private disableLiveDiagnostics() {
+        const currentCodeLensSetting = workspace.getConfiguration().get(createCommand(SHOW_CODE_LENS)) as boolean;
+        if (currentCodeLensSetting) {
+            workspace.getConfiguration().update(createCommand(SHOW_CODE_LENS), false, ConfigurationTarget.Global)
+                .then(() => {
+                    //Logger.logSettingsChange(SHOW_CODE_LENS, "false");
+                    this.logSettingsChange(SHOW_CODE_LENS, "false");
+                })
+                .then(undefined, err => console.log(err));
+        }
     }
 
     /**

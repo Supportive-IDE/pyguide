@@ -1,6 +1,6 @@
 import {commands, Disposable, env, ExtensionContext, languages, window, workspace } from 'vscode';
-import { ExtendedGuidance, FeedbackLens, paramsMap, subscribeToDocumentChanges } from './diagnostics';
-import { AGREE_TO_HELP, CANT_FIX, CODELENS_EXTERNAL_FEEDBACK, createCommand, DIAGNOSTIC_EXTERNAL_FEEDBACK, DISABLE, ENABLE, EXTENSION_ID, FEEDBACK_RECEIVED_FOR, INSTALL_DATE, ISSUE_IRRELEVANT, LEARNED_SOMETHING, LEAVE_FEEDBACK, MISSED_ISSUE, PRIVACY, REQUEST_USER_INPUT, RESEARCH_PROMPT_SENT, SHOW_EXTERNAL_FEEDBACK } from './utils';
+import { ExtendedGuidance, FeedbackLens, paramsMap, refreshDiagnostics, subscribeToDocumentChanges } from './diagnostics';
+import { AGREE_TO_HELP, CANT_FIX, CODELENS_EXTERNAL_FEEDBACK, createCommand, DIAGNOSTIC_EXTERNAL_FEEDBACK, DISABLE, ENABLE, EXTENSION_ID, FEEDBACK_RECEIVED_FOR, INSTALL_DATE, ISSUE_IRRELEVANT, LEARNED_SOMETHING, LEAVE_FEEDBACK, MISSED_ISSUE, PRIVACY, REQUEST_USER_INPUT, RESEARCH_PROMPT_SENT, SHOW_EXTERNAL_FEEDBACK, RUN_PYGUIDE_DIAGNOSTICS, EventTypes, SHOW_CODE_LENS } from './utils';
 import { Logger } from './logging';
 import { createAndShowWebview } from './webview';
 
@@ -11,10 +11,21 @@ export async function activate(context: ExtensionContext) {
 
 	const sideDiagnostics = languages.createDiagnosticCollection("PyGuide");
 	const sideLens = new FeedbackLens(context);
+	
+	
 	subscribeToDocumentChanges(context, sideDiagnostics, sideLens, logger);
 	//registerForResearchPrompt(context);
 
 	disposables.push(
+		workspace.onDidChangeConfiguration(e => {
+			// This always runs after the logger calls disable code lens
+			if (e.affectsConfiguration(createCommand(SHOW_CODE_LENS))) {
+				const isCodeLensEnabled = workspace.getConfiguration().get(createCommand(SHOW_CODE_LENS)) as boolean;
+				console.log("Code lens setting changed, new value:", isCodeLensEnabled);
+				sideLens.checkCodeLensStatus(e);
+				logger.logSettingsChange(SHOW_CODE_LENS, isCodeLensEnabled.toString());
+			}
+		}),
 		commands.registerCommand(createCommand(ENABLE), () => {
 			workspace.getConfiguration(EXTENSION_ID).update(ENABLE, true, true);
 		}),
@@ -39,6 +50,12 @@ export async function activate(context: ExtensionContext) {
 		// User clicked "was this helpful?"
 		commands.registerCommand(createCommand(REQUEST_USER_INPUT), (args: any) => {
 			getUserInput(args, context, logger);
+		}),
+		// User clicked the PyGuide status bar button
+		commands.registerCommand(createCommand(RUN_PYGUIDE_DIAGNOSTICS), () => {
+			if (window.activeTextEditor) {
+				refreshDiagnostics(window.activeTextEditor.document, sideDiagnostics, sideLens, logger, [], EventTypes.request, true);
+			}
 		}),
         sideDiagnostics,
         languages.registerCodeActionsProvider('python', new ExtendedGuidance(), {

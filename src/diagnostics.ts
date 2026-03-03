@@ -6,12 +6,15 @@ import {
     CodeLensProvider,
     CodeLens,
     EventEmitter, Event,
-    ConfigurationChangeEvent
+    ConfigurationChangeEvent,
+    StatusBarItem, StatusBarAlignment,
+    Disposable
 } from 'vscode';
 const sideLib = require('./lib/side-lib.es.js');
 import { Feedback, SideLibResult } from './types';
-import { CODELENS_EXTERNAL_FEEDBACK, DIAGNOSTIC_EXTERNAL_FEEDBACK, EXTENSION_ID, EventTypes, REQUEST_USER_INPUT, SHOW_CODE_LENS, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators, warningIndicators } from './utils';
+import { CODELENS_EXTERNAL_FEEDBACK, DIAGNOSTIC_EXTERNAL_FEEDBACK, EXTENSION_ID, EventTypes, REQUEST_USER_INPUT, RUN_PYGUIDE_DIAGNOSTICS, SHOW_CODE_LENS, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators, warningIndicators } from './utils';
 import { Logger } from './logging';
+import { clear } from 'console';
 
 // Stores the parameters associated with each diagnostic
 export const paramsMap = new Map<string, string>();
@@ -28,7 +31,9 @@ export function refreshDiagnostics(doc: TextDocument,
     sideLens: FeedbackLens,
     logger: Logger, 
     changes: readonly TextDocumentContentChangeEvent[] = [], 
-    eventType: EventTypes | undefined = undefined): void {
+    eventType: EventTypes | undefined = undefined,
+    forceRefresh: boolean = false
+): void {
     if (doc.languageId === 'python') {
         // set up
         const diagnostics: Diagnostic[] = [];
@@ -50,26 +55,54 @@ export function refreshDiagnostics(doc: TextDocument,
             const diagnostic = createDiagnostic(feedback, startPos, doc.positionAt(endIndex), doc.fileName);
             diagnostics.push(diagnostic);
             // Create code lenses
-            if (FeedbackLens.enabled) {
-                const codeLens = sideLens.createCodeLens(feedback, startPos, doc.positionAt(endIndex), doc.fileName);
-                codeLenses.push(codeLens);
-                // Only request user input if: 
-                // logging is active 
-                // input has not already been received for this misconception
-                // there is only one issue on this line
-                if (logger.isLogActive() && feedbackCountByLine.get(startPos.line) && feedbackCountByLine.get(startPos.line) === 1 && !logger.haveReceivedUserInputFor(feedback.type)) {
-                    const inputRequest = sideLens.createInputLink(feedback, startPos, startPos, doc.fileName);
-                    codeLenses.push(inputRequest);
+            //if (FeedbackLens.enabled) {
+            const codeLens = sideLens.createCodeLens(feedback, startPos, doc.positionAt(endIndex), doc.fileName);
+            codeLenses.push(codeLens);
+            // Only request user input if: 
+            // logging is active 
+            // input has not already been received for this misconception
+            // there is only one issue on this line
+            if (logger.isLogActive() && feedbackCountByLine.get(startPos.line) && feedbackCountByLine.get(startPos.line) === 1 && !logger.haveReceivedUserInputFor(feedback.type)) {
+                const inputRequest = sideLens.createInputLink(feedback, startPos, startPos, doc.fileName);
+                codeLenses.push(inputRequest);
+            }
+                
+            //}
+        }
+
+        if (FeedbackLens.enabled || forceRefresh) {
+            sideLens.refreshCodeLenses(codeLenses, forceRefresh);
+            sideDiagnostics.set(doc.uri, diagnostics);
+            // Need to clear on next edit in forcerefresh mode to prevent stale diagnostics and code lenses
+            if (forceRefresh) {
+                let listenersToDispose: Disposable[] = [];
+                const clearDiagnostics = (docChanged: TextDocument) => {
+                    if (docChanged === doc) {
+                        sideLens.refreshCodeLenses([], false);
+                        sideDiagnostics.delete(doc.uri);
+                        listenersToDispose.forEach(listener => listener.dispose());
+                    }
                 }
+
+                const listener = workspace.onDidChangeTextDocument(e => {
+                    clearDiagnostics(e.document);
+                    listenersToDispose.push(listener);
+                });
+                const editorListener = window.onDidChangeActiveTextEditor(editor => {
+                    if (editor) {
+                        clearDiagnostics(editor.document);
+                        listenersToDispose.push(editorListener);
+                    }
+                });
+                const closeListener = workspace.onDidCloseTextDocument(closedDoc => {
+                    clearDiagnostics(closedDoc);
+                    listenersToDispose.push(closeListener)
+                });
                 
             }
         }
-        sideLens.refreshCodeLenses(codeLenses);
-
-        sideDiagnostics.set(doc.uri, diagnostics);
     }
 }
-
 
 /**
  * Helper function to count the number of feedback messages starting on a particular line
@@ -144,11 +177,22 @@ export function subscribeToDocumentChanges(context: ExtensionContext, sideDiagno
         refreshDiagnostics(window.activeTextEditor.document, 
                            sideDiagnostics, sideLens,
                            logger);
+        if (window.activeTextEditor.document.languageId === 'python') {
+            sideLens.refreshStatusBarButton(true);
+        } else {
+            sideLens.refreshStatusBarButton(false);
+        }
 	}
 	context.subscriptions.push(
 		window.onDidChangeActiveTextEditor(editor => {
 			if (editor) {
                 refreshDiagnostics(editor.document, sideDiagnostics, sideLens, logger);
+                if (editor.document.languageId === 'python') {
+                    sideLens.refreshStatusBarButton(true);
+                } else {
+                    sideLens.refreshStatusBarButton(false);
+                }
+                
 			}
 		})
 	);
@@ -206,16 +250,29 @@ export class ExtendedGuidance implements CodeActionProvider {
 
 export class FeedbackLens implements CodeLensProvider {
     private codeLenses: CodeLens[] = [];
+    private pyGuideBtn: StatusBarItem;
     static enabled: boolean = true;
 
     constructor(context: ExtensionContext) {
+        // Modify this to check whether code lens or button
         FeedbackLens.enabled = workspace.getConfiguration().get(createCommand(SHOW_CODE_LENS)) as boolean;
-        context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.checkCodeLensStatus(e)));
+        //context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.checkCodeLensStatus(e)));
+        this.pyGuideBtn = window.createStatusBarItem("PyGuide", StatusBarAlignment.Left, 100);
+        this.configureStatusBarButton();
     }
 
-    private checkCodeLensStatus(e: ConfigurationChangeEvent) {
+    private configureStatusBarButton() {
+        
+        this.pyGuideBtn.text = "PyGuide";
+        this.pyGuideBtn.tooltip = "Run PyGuide diagnostics";
+        this.pyGuideBtn.command = createCommand(RUN_PYGUIDE_DIAGNOSTICS);
+        // add button and command to subscriptions (to allow them to be disposed on extension deactivation)
+    }
+
+    public checkCodeLensStatus(e: ConfigurationChangeEvent) {
         if (e.affectsConfiguration(createCommand(SHOW_CODE_LENS))) {
             FeedbackLens.enabled = workspace.getConfiguration().get(createCommand(SHOW_CODE_LENS)) as boolean;
+        
             if (!FeedbackLens.enabled) {
                 this.codeLenses = [];
                 this._onDidChangeCodeLenses.fire();
@@ -250,9 +307,17 @@ export class FeedbackLens implements CodeLensProvider {
         )
     }
 
-    public refreshCodeLenses(codeLenses: CodeLens[]) {
-        this.codeLenses = FeedbackLens.enabled ? codeLenses : [];
+    public refreshCodeLenses(codeLenses: CodeLens[], forceDisplay: boolean = false) {
+        this.codeLenses = FeedbackLens.enabled || forceDisplay ? codeLenses : [];
         this._onDidChangeCodeLenses.fire();
+    }
+
+    public refreshStatusBarButton(show: boolean) {
+        if (show && !FeedbackLens.enabled) {
+            this.pyGuideBtn.show();
+        } else {
+            this.pyGuideBtn.hide();
+        }
     }
 
     public provideCodeLenses(_: TextDocument): CodeLens[] {

@@ -17,6 +17,7 @@ export const SHOW_EXTERNAL_FEEDBACK = "showExternalFeedback";
 export const REQUEST_USER_INPUT = "requestUserFeedback";
 export const DIAGNOSTIC_EXTERNAL_FEEDBACK = "diagnosticExternalFeedback";
 export const CODELENS_EXTERNAL_FEEDBACK = "codelensExternalFeedback";
+export const RUN_PYGUIDE_DIAGNOSTICS = "runPyGuideDiagnostics";
 
 // Commands accessible in the command panel
 export const ENABLE = "enable"; // package.json
@@ -44,7 +45,8 @@ export enum EventTypes {
     run = "run",
     save = "save",
     close = "close",
-    action = "action"
+    action = "action",
+    request = "request"
 }
 
 export const errorIndicators = new Set(["AssignCompares", "ColonAssigns", "LocalVariablesAreGlobal"]);
