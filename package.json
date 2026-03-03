@@ -47,7 +47,7 @@
         "pyguide.showCodeLens": {
           "type": "boolean",
           "default": true,
-          "markdownDescription": "Display feedback messages and disagnostics in the code. If this is disabled, feedback can be requested by clicking the PyGuide status bar button.",
+          "markdownDescription": "Display feedback messages and diagnostics in the code. If this is disabled, feedback can be requested by clicking the PyGuide status bar button.",
           "tags":["help", "guidance", "configuration"]
         }
       }

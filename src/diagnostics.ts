@@ -257,7 +257,7 @@ export class FeedbackLens implements CodeLensProvider {
         // Modify this to check whether code lens or button
         FeedbackLens.enabled = workspace.getConfiguration().get(createCommand(SHOW_CODE_LENS)) as boolean;
         //context.subscriptions.push(workspace.onDidChangeConfiguration(e => this.checkCodeLensStatus(e)));
-        this.pyGuideBtn = window.createStatusBarItem("PyGuide", StatusBarAlignment.Left, 100);
+        this.pyGuideBtn = window.createStatusBarItem("PyGuide", StatusBarAlignment.Left, 1);
         this.configureStatusBarButton();
     }
 
