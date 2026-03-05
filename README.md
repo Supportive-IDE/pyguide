@@ -1,6 +1,6 @@
 # PyGuide Extension for Visual Studio Code
 
-Provides additional Python diagnostic messages aimed at beginners.
+Provides additional Python diagnostic messages aimed at beginners—-coders who are still getting comfortable with Python basics like boolean expressions and loops. 
 
 The extension was created by researchers at the University of York. Usage data collection is enabled by default to help us improve the extension. You can disable data collection at any time in Settings. Search for PyGuide then untick the box next to "Allow a University of York research project to collect usage data". [Read about the project and the data we collect on our website](https://supportive-ide.hosted.york.ac.uk/participate.html). Data collection is anonymous. 
 
@@ -39,6 +39,9 @@ This extension contributes the following settings:
 This extension can only detect issues that are task independent—it cannot detect logic errors or strategic errors that would require knowledge of what you are working on. It is intended for beginner programmers so may not work with more advanced concepts and syntax.
 
 ## Release Notes
+
+### 0.5.1
+Fixed a user-reported bug relating to use of named parameters inside function or method calls inside of a boolean expression.
 
 ### 0.5.0
 Major change to feedback presentation. By default, feedback is no longer provided in real-time as you type. Instead, press the PyGuide button to check for issues. If you prefer real-time feedback, you can enable it via the settings described above.

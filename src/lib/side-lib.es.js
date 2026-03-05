@@ -15,12 +15,12 @@ var Gs = (g, i, e, n) => ({
     return u(g, i, n);
   }
 }), Ii = (g, i, e) => Gc(Uc(g), e, i);
-class xt {
+class Mt {
   constructor(i) {
     this.name = i;
   }
 }
-const T = class T extends xt {
+const T = class T extends Mt {
   /**
    * Returns the Character representation of an ascii code.
    * @param {Number} code The ascii code of a character
@@ -96,12 +96,12 @@ l(T, "DoubleQuote", new T("doubleQuote")), /** (Static) The @ symbol */
 l(T, "At", new T("at")), /** (Static) Any other character not described. */
 l(T, "Unknown", new T("unknown"));
 let G = T;
-const A = class A extends xt {
+const A = class A extends Mt {
 };
 l(A, "BlockDefinitions", new A("BlockDefinitions")), l(A, "LogicalOperators", new A("LogicalOperators")), l(A, "Types", new A("Types")), l(A, "MathsOperators", new A("MathsOperators")), l(A, "ComparisonOperators", new A("ComparisonOperators")), l(A, "OtherKeywords", new A("OtherKeywords")), l(A, "BuiltInFunctions", new A("BuiltInFunctions")), l(A, "BuiltInMethods", new A("BuiltInMethods")), l(A, "OtherMethods", new A("OtherMethods")), l(A, "Identifiers", new A("Identifiers")), l(A, "MagicMethods", new A("MagicMethods")), l(A, "SpecialVariables", new A("SpecialVariables")), l(A, "Properties", new A("Properties")), l(A, "BuiltInExceptions", new A("BuiltInExceptions")), l(A, "Literals", new A("Literals")), l(A, "CompoundTypes", new A("CompoundTypes")), l(A, "Other", new A("Other")), l(A, "Comment", new A("Comment")), l(A, "Unknown", new A("Unknown")), l(A, "BuiltInModules", new A("BuiltInModules")), l(A, "ModuleFunctions", new A("ModuleFunctions")), l(A, "ModuleProperties", new A("ModuleProperties")), l(A, "ClassAttributes", new A("ClassAttributes")), l(A, "ImportedEntities", new A("ImportedEntities")), l(A, "TypeHint", new A("TypeHint")), l(A, "SyntacticSugar", new A("SyntacticSugar")), // Refactor: multipart expressions
 l(A, "FunctionCall", new A("FunctionCall")), l(A, "MethodCall", new A("MethodCall")), l(A, "ExceptionCall", new A("ExceptionCall")), l(A, "BlockDefinitionStatement", new A("BlockDefinitionStatement")), l(A, "Group", new A("Group")), l(A, "MultipartValue", new A("MultipartValue")), l(A, "Assignment", new A("Assigment")), l(A, "KeywordStatement", new A("KeywordStatement"));
 let c = A;
-const r = class r extends xt {
+const r = class r extends Mt {
 };
 // Block definitions - all in lookup
 l(r, "ClassDefinition", new r("class")), l(r, "FunctionDefinition", new r("def")), l(r, "ElifDefinition", new r("elif")), l(r, "ElseDefinition", new r("else")), l(r, "ExceptDefinition", new r("except")), l(r, "FinallyDefinition", new r("finally")), l(r, "ForDefinition", new r("for")), l(r, "IfDefinition", new r("if")), l(r, "LambdaDefinition", new r("lambda")), l(r, "TryDefinition", new r("try")), l(r, "WhileDefinition", new r("while")), l(r, "DocumentDefinition", new r("document")), // for identifying document level scope
@@ -315,7 +315,7 @@ l(r, "SubscriptedExpression", new r("SubscriptedExpression")), l(r, "CalculatedE
 l(r, "AssignmentStatement", new r("AssignmentStatement")), l(r, "ChangeStatement", new r("ChangeStatement")), // Statements beginning with keyword
 l(r, "ImportStatement", new r("ImportStatement")), l(r, "AssertStatement", new r("AssertStatement")), l(r, "GlobalStatement", new r("GlobalStatement")), l(r, "ThrowStatement", new r("ThrowStatement"));
 let t = r;
-const P = class P extends xt {
+const P = class P extends Mt {
   constructor(i, e = !1, n = /* @__PURE__ */ new Map(), s = /* @__PURE__ */ new Map()) {
     super(i), this.isCustom = e, this.attributes = n, this.methods = s;
   }
@@ -338,7 +338,7 @@ l(P, "Undefined", new P("undefined")), // Reserved for cases where a variable is
 // Built in modules
 l(P, "Random", new P("random")), l(P, "Math", new P("math")), l(P, "StringModule", new P("string module")), l(P, "Re", new P("re")), l(P, "Pattern", new P("Pattern")), l(P, "Match", new P("Match")), l(P, "Sys", new P("sys"));
 let d = P;
-const v = class v extends xt {
+const v = class v extends Mt {
   /**
    * Creates a new MisconceptionInfo
    * @param {String} name The unique name of the misconception
@@ -480,7 +480,7 @@ l(v, "WhileSameAsIf", new v(
   "A while loop does not modify any of its loop variables and may also always exit during the first iteration. Where this behaviour is intentional, the while definition would be better replaced with an if statement. Where the loop does not exit, there is a risk of an infinite loop."
 ));
 let R = v;
-const W = class W extends xt {
+const W = class W extends Mt {
   constructor(e, n) {
     super(e);
     l(this, "description");
@@ -489,7 +489,7 @@ const W = class W extends xt {
 };
 l(W, "Equality", new W("Equality", "A correctly formed equality check, e.g. x == y, where a Boolean expression is expected, such as an if statement or a while loop definition.")), l(W, "Assignment", new W("Assignment", "A correctly formed assigment statement.")), l(W, "MultipleEquality", new W("MultipleEquality", "A boolean expression comprised of multiple correctly formed equality checks.")), l(W, "BooleanVariableCondition", new W("BooleanVariableCondition", "A single Boolean variable is used as a condition statement instead of explicitly comparing the variable to True or False.")), l(W, "ReturnLast", new W("ReturnLast", "A function contains at least one return statement and all returns are the last statement in their branch.")), l(W, "NewForLoopVar", new W("NewForLoopVar", "A new variable is created in a for loop definition.")), l(W, "FunctionCall", new W("FunctionCall", "A correctly formed function call.")), l(W, "SingleCounterLoop", new W("SingleCounterLoop", "A counter loop that is not nested in while loop.")), l(W, "VariablesInMultipleScopes", new W("VariablesInMultipleScopes", "The document has defined variables in function and document scope. If there are variables in document scope that have the same name as valid function scope variables, the document scope variables are not undefined.")), l(W, "ForLoopTargetNotModified", new W("ForLoopTargetNotModified", "A for loop target variable is used in the loop without modification.")), l(W, "BooleanExpressionUsedAsValue", new W("BooleanExpressionUsedAsValue", "A non-literal Boolean expression is assigned or returned directly.")), l(W, "UsedReturn", new W("UsedReturn", "The value returned by a function is used or stored.")), l(W, "ReturnNoParentheses", new W("ReturnNoParentheses", "A return value is not in parentheses.")), l(W, "MultiBranchConditional", new W("MultiBranchConditional", "A conditional made up of multiple branches.")), l(W, "ParameterCalled", new W("ParameterCalled", "An function parameter is called in the function before or without modification.")), l(W, "StringMethodAssigned", new W("StringMethodAssigned", "The result of a string method call is assigned or passed.")), l(W, "ConversionAssigned", new W("ConversionAssigned", "The result of a type conversion function call is assigned or passed.")), l(W, "WhileLoopProgresses", new W("WhileLoopProgresses", "The loop variable(s) of a while loop is modified and the loop does not have an early exit.")), l(W, "LoopExitsSometimes", new W("LoopExitsSometimes", "A loop contains a return that is conditional."));
 let oe = W;
-const D = class D extends xt {
+const D = class D extends Mt {
   constructor(e, n) {
     super(e);
     l(this, "description");
@@ -541,7 +541,7 @@ l(D, "WhileLoopVarAssignedIntLiteral", new D(
 l(D, "WrongArgNumber", new D("WrongArgNumber", "A user-defined function is called with the wrong number of arguments.")), // RiskFactor
 l(D, "WhileTrue", new D("WhileTrue", "A while loop is defined to iterate forever. This is a valid approach but may be a contributor to misconceptions when combined with other symptoms."));
 let I = D;
-const q = class q extends xt {
+const q = class q extends Mt {
   constructor(e, n) {
     super(e);
     l(this, "description");
@@ -3293,7 +3293,7 @@ class Tu extends J {
     return e.hasOwnProperty("before") && (i.before = e.before), e.hasOwnProperty("after") && (i.after = e.after), i;
   }
 }
-class xu extends J {
+class Mu extends J {
   /**
    * @inheritdoc
    */
@@ -3303,7 +3303,7 @@ class xu extends J {
     return e.hasOwnProperty("objectType") && (i.objectType = e.objectType), i;
   }
 }
-class Mu extends J {
+class xu extends J {
   /**
    * @inheritdoc
    */
@@ -3580,9 +3580,9 @@ const At = class At {
       case I.UnexpectedColon:
         return new Tu(i.name, p, w, S, F, N, o);
       case I.UnknownMethod:
-        return new xu(i.name, p, w, S, F, N, o);
-      case I.UnreachableExit:
         return new Mu(i.name, p, w, S, F, N, o);
+      case I.UnreachableExit:
+        return new xu(i.name, p, w, S, F, N, o);
       case I.UnreachableInfiniteLoop:
         return new Du(i.name, p, w, S, F, N, o);
       case I.UnusedReturn:
@@ -4306,7 +4306,7 @@ class Zo {
   }
 }
 dn = new WeakMap(), gt = new WeakMap(), pt = new WeakMap();
-var $e, mt, de, us, Y, $, _o, er, tr, nr, sr, ir, Ti, xi, Mi, Di, or, Ai, Bi, ki, qn;
+var $e, mt, de, us, Y, $, _o, er, tr, nr, sr, ir, Ti, Mi, xi, Di, or, Ai, Bi, ki, qn;
 class Yo extends pi {
   /**
    * Creates a new StatementBlock representing a block of Python code
@@ -4793,15 +4793,15 @@ sr = function(e) {
   let o = [];
   for (let S = 0; S < s.length - 1; S++) {
     const F = s[S].getFirstExpression(), N = s[S + 1].getFirstExpression();
-    if (F.is(t.IfDefinitionStatement) && N.is(t.IfDefinitionStatement) && !m(a = e, $, xi).call(a, s[S]) && !m(h = e, $, xi).call(h, s[S + 1]))
+    if (F.is(t.IfDefinitionStatement) && N.is(t.IfDefinitionStatement) && !m(a = e, $, Mi).call(a, s[S]) && !m(h = e, $, Mi).call(h, s[S + 1]))
       o.length === 0 && o.push(s[S]), o.push(s[S + 1]);
     else if (o.length > 0) {
-      const L = m(p = e, $, Mi).call(p, o);
+      const L = m(p = e, $, xi).call(p, o);
       L !== void 0 && n.push(L), o = [];
     }
   }
   if (o.length > 0) {
-    const S = m(w = e, $, Mi).call(w, o);
+    const S = m(w = e, $, xi).call(w, o);
     S !== void 0 && n.push(S);
   }
   return n;
@@ -4851,7 +4851,7 @@ Ti = function(e) {
  * @param {BlockStatement} statement 
  * @returns {Boolean}
  */
-xi = function(e) {
+Mi = function(e) {
   const n = e.getStatements().slice(1);
   for (const s of n)
     if (!s.isBlockStatement() && Pt(s.getFirstExpression()))
@@ -4862,7 +4862,7 @@ xi = function(e) {
  * @param {Statement[]} sequence 
  * @returns {Symptom | undefined}
  */
-Mi = function(e) {
+xi = function(e) {
   if (e.length === 0) return;
   const n = [];
   let s = [];
@@ -4927,14 +4927,14 @@ or = function(e) {
     if (N.is(t.IfDefinitionStatement)) {
       const U = o[S].getStatements();
       if (L.is(t.ElseDefinitionStatement)) {
-        const x = o[S + 1].getStatements();
-        if (U.length === 2 && x.length === 2 && m(a = e, $, Bi).call(a, U[1], x[1])) {
+        const M = o[S + 1].getStatements();
+        if (U.length === 2 && M.length === 2 && m(a = e, $, Bi).call(a, U[1], M[1])) {
           const ot = n(U[0]);
           F = {
             form: Ni,
             condition: ot
           };
-        } else if (U.length === 2 && x.length === 2 && m(h = e, $, Ai).call(h, U[1], x[1])) {
+        } else if (U.length === 2 && M.length === 2 && m(h = e, $, Ai).call(h, U[1], M[1])) {
           const ot = n(U[0]);
           F = {
             form: Ci,
@@ -4943,22 +4943,22 @@ or = function(e) {
           };
         }
       } else if (U.length === 2 && m(p = e, $, Bi).call(p, U[1], o[S + 1])) {
-        const x = n(U[0]);
+        const M = n(U[0]);
         F = {
           form: Ni,
-          condition: x
+          condition: M
         };
       } else if (U.length === 2 && m(w = e, $, Ai).call(w, U[1], o[S + 1])) {
-        const x = n(U[0]);
+        const M = n(U[0]);
         F = {
           form: Ci,
           variableAssigned: U[1].getFirstExpression().getTargetVariables()[0].getTextValue(),
-          condition: x
+          condition: M
         };
       }
       if (F.hasOwnProperty("form")) {
-        const x = [...o[S].getExpressions(), ...o[S + 1].getExpressions()];
-        s.push(O.createStatementSymptom(I.OneLineConditional, x, 0, x.length - 1, F));
+        const M = [...o[S].getExpressions(), ...o[S + 1].getExpressions()];
+        s.push(O.createStatementSymptom(I.OneLineConditional, M, 0, M.length - 1, F));
       }
     }
   }
@@ -5577,18 +5577,18 @@ hr = function(e) {
       w.set(F, !1), S.set(F, []);
     for (const F of p)
       for (const N of F.getExpressions()) {
-        const L = N.getExpressionsOfKind(t.ChangeStatement).flatMap((x) => x.getTargetVariables()).filter((x) => h.has(x.getTextValue())), U = N.getExpressionsOfKind(t.AssignmentStatement).flatMap((x) => x.getTargetVariables()).filter((x) => h.has(x.getTextValue()));
-        for (const x of L)
-          w.has(x.getTextValue()) && w.set(x.getTextValue(), !0);
-        for (const x of U)
-          S.has(x.getTextValue()) && S.get(x.getTextValue()).push(x);
+        const L = N.getExpressionsOfKind(t.ChangeStatement).flatMap((M) => M.getTargetVariables()).filter((M) => h.has(M.getTextValue())), U = N.getExpressionsOfKind(t.AssignmentStatement).flatMap((M) => M.getTargetVariables()).filter((M) => h.has(M.getTextValue()));
+        for (const M of L)
+          w.has(M.getTextValue()) && w.set(M.getTextValue(), !0);
+        for (const M of U)
+          S.has(M.getTextValue()) && S.get(M.getTextValue()).push(M);
       }
     for (const F of h)
       if (!w.get(F) && S.get(F).length > 0) {
         let N = [], L = !1;
         for (const U of S.get(F)) {
-          const x = U.getParent().getAssignedValues();
-          if (x.length === 1 && x[0].is(t.IntLiteral))
+          const M = U.getParent().getAssignedValues();
+          if (M.length === 1 && M[0].is(t.IntLiteral))
             N.push(U);
           else {
             L = !0;
@@ -5617,8 +5617,8 @@ fr = function(e) {
         const L = w.get(N);
         for (const U of L) {
           U === e && S.add(N);
-          const x = U.getNearestParentOfAny([t.WhileDefinition, t.ForDefinition]);
-          x !== void 0 && x !== e && e.hasChild(x) ? (F.has(N) || F.set(N, /* @__PURE__ */ new Set()), F.get(N).add(x)) : x !== void 0 && x === e && S.add(N);
+          const M = U.getNearestParentOfAny([t.WhileDefinition, t.ForDefinition]);
+          M !== void 0 && M !== e && e.hasChild(M) ? (F.has(N) || F.set(N, /* @__PURE__ */ new Set()), F.get(N).add(M)) : M !== void 0 && M === e && S.add(N);
         }
       }
       S.size === 0 && n.push(O.createStatementSymptom(
@@ -5637,10 +5637,10 @@ fr = function(e) {
           modifiedIn: [],
           varDataType: []
         }, e.getId());
-        for (const x of L)
+        for (const M of L)
           U.getAdditionalInfo().modifiedIn.push({
-            loopType: x.getBlockEntity().name,
-            startLine: x.getStatements()[0].getFirstLineNumber(),
+            loopType: M.getBlockEntity().name,
+            startLine: M.getStatements()[0].getFirstLineNumber(),
             varDataType: N.getDataType().name
           });
         n.push(U);
@@ -5715,7 +5715,7 @@ pr = function(e) {
   }
   return n;
 };
-var te, Kt, fs, fn, Qe, ke, K, Wt, gs, Pe, ve, Se, wt, wo, C, mr, wr, Li, Sr, Mt, ze, Ae, br, Ir, vi, Ri, yr, Ei, Fr, Nr, Cr, Or, Tr, xr, Mr, Dr, Ar, Br, kr, nn, Pr, _u, Vr, Lr, vr, Rr, Er, Ur, Gr, Jr, $r, Kr;
+var te, Kt, fs, fn, Qe, ke, K, Wt, gs, Pe, ve, Se, wt, wo, C, mr, wr, Li, Sr, xt, ze, Ae, br, Ir, vi, Ri, yr, Ei, Fr, Nr, Cr, Or, Tr, Mr, xr, Dr, Ar, Br, kr, nn, Pr, _u, Vr, Lr, vr, Rr, Er, Ur, Gr, Jr, $r, Kr;
 class Hn {
   // Stores symptoms that can be detected while line processing is in progress
   constructor(i, e, n, {
@@ -5892,7 +5892,7 @@ mr = function(i, e, n, s) {
     else if (a.isQuote())
       o = m(this, C, br).call(this, a, o);
     else if (m(this, C, Tr).call(this, a))
-      o = m(this, C, xr).call(this, o, e, n, s);
+      o = m(this, C, Mr).call(this, o, e, n, s);
     else if (m(this, C, Lr).call(this, a, o, o === 0 || G.getCategory(u(this, K).charCodeAt(o - 1)) === G.Space))
       o = m(this, C, Rr).call(this, o);
     else if (m(this, C, Er).call(this, a))
@@ -5927,7 +5927,7 @@ Li = function() {
  * @param {ExpressionEntity} entity 
  * @returns {Boolean} True if the expression is found, false otherwise
  */
-Mt = function(i) {
+xt = function(i) {
   for (let e of u(this, te))
     if (e.is(i))
       return !0;
@@ -6082,8 +6082,8 @@ Tr = function(i) {
  * @param {boolean} classDefinitionInProgress Indicates if a class definition is in progress to enable method definitions to be distinguished from function definitions
  * @returns {Number} The local index of the last character processed
  */
-xr = function(i, e, n, s) {
-  let o = m(this, C, Mr).call(this, i), a = m(this, C, Dr).call(this, o, m(this, C, Vr).call(this, i + o.length), e, n, s);
+Mr = function(i, e, n, s) {
+  let o = m(this, C, xr).call(this, i), a = m(this, C, Dr).call(this, o, m(this, C, Vr).call(this, i + o.length), e, n, s);
   const h = sn(o, a, u(this, Pe), u(this, ve) + i, i);
   return m(this, C, ze).call(this) && (a.entity === t.InKeyword && m(this, C, Ae).call(this).is(t.NotOperator) || a.entity === t.NotOperator && m(this, C, Ae).call(this).is(t.IsKeyword)) ? (o = ge([m(this, C, Ae).call(this), h]), a = new Q(a.entity === t.InKeyword ? t.NotInKeyword : t.IsNotKeyword, c.ComparisonOperators), i = m(this, C, Ae).call(this).getDocumentStartIndex() - u(this, ve), u(this, te)[u(this, te).length - 1] = sn(o, a, u(this, Pe), m(this, C, Ae).call(this).getDocumentStartIndex())) : u(this, te).push(h), i + o.length - 1;
 }, /**
@@ -6092,7 +6092,7 @@ xr = function(i, e, n, s) {
  * @param {Number} startIndex The local index in the raw content of the first character
  * @returns {String} The identifier name or keyword
  */
-Mr = function(i) {
+xr = function(i) {
   let e = i;
   for (let n = i + 1; n < u(this, K).length; n++) {
     const s = G.getCategory(u(this, K).charCodeAt(n));
@@ -6119,7 +6119,7 @@ Dr = function(i, e, n, s, o) {
       return o ? new Q(t.MethodName, c.Identifiers) : new Q(t.FunctionName, c.Identifiers);
     if (h.is(t.ClassDefinition))
       return new Q(t.ClassName, c.Identifiers);
-    if (h.is(t.FromKeyword) || m(this, C, Mt).call(this, t.ImportKeyword) && !m(this, C, Mt).call(this, t.FromKeyword))
+    if (h.is(t.FromKeyword) || m(this, C, xt).call(this, t.ImportKeyword) && !m(this, C, xt).call(this, t.FromKeyword))
       if (h.is(t.AsKeyword) && u(this, te).length > 1) {
         const p = u(this, te)[u(this, te).length - 2];
         return new Q(p.getEntity(), p.getCategory());
@@ -6136,11 +6136,11 @@ Dr = function(i, e, n, s, o) {
         }
       }
     } else {
-      if (m(this, C, Mt).call(this, t.FromKeyword) && m(this, C, Mt).call(this, t.ImportKeyword))
+      if (m(this, C, xt).call(this, t.FromKeyword) && m(this, C, xt).call(this, t.ImportKeyword))
         return m(this, C, Pr).call(this, i);
       if ((i === "sep" || i === "end") && !(h.is(t.Comma) && e === "="))
         return new Q(t.VariableName, c.Identifiers);
-      if (a.entity !== t.VariableName && tu(i) && m(this, C, Mt).call(this, t.FunctionDefinition) && h.isOneOf([t.OpenParenthesis, t.Comma]))
+      if (a.entity !== t.VariableName && tu(i) && m(this, C, xt).call(this, t.FunctionDefinition) && h.isOneOf([t.OpenParenthesis, t.Comma]))
         return new Q(t.VariableName, c.Identifiers);
     }
   } else if (i === "sep" || i === "end")
@@ -6176,7 +6176,7 @@ Pr = function(i) {
     let e = Ze(i);
     if (e.category === c.ModuleFunctions || e.category === c.ModuleProperties) {
       const n = ko.has(e.entity) ? ko.get(e.entity) : void 0;
-      return n && m(this, C, Mt).call(this, n) ? e : new Q(t.NamedImport, c.Identifiers);
+      return n && m(this, C, xt).call(this, n) ? e : new Q(t.NamedImport, c.Identifiers);
     }
     return e.entity === t.Unknown ? new Q(t.NamedImport, c.Identifiers) : e;
   }
@@ -6287,7 +6287,7 @@ $r = function(i) {
 Kr = function(i) {
   u(this, Se).hasOwnProperty(i) ? u(this, Se)[i]++ : i === ")" ? u(this, Se)["("]-- : i === "]" ? u(this, Se)["["]-- : i === "}" && u(this, Se)["{"]--;
 };
-var M, Ui, Wr, qr, jr, Hr, zr, Qr, Xr, Zr, Gi, Yr, _r, ea, ta, pe, na, sa, ia, Ji, oa, $i, ra, Ki, aa, la, ca, ua, Wi, da;
+var x, Ui, Wr, qr, jr, Hr, zr, Qr, Xr, Zr, Gi, Yr, _r, ea, ta, pe, na, sa, ia, Ji, oa, $i, ra, Ki, aa, la, ca, ua, Wi, da;
 const Qn = class Qn {
   /**
    * Takes an expressions array and combines individual expressions into multipart expressions
@@ -6297,7 +6297,7 @@ const Qn = class Qn {
    */
   static createTree(i) {
     let e = i.filter((n) => !n.is(t.ContinuationLine));
-    return m(this, M, Hr).call(this, i) ? [m(this, M, Qr).call(this, i)] : (e.length > 1 && (e = m(this, M, ia).call(this, e), e = m(this, M, sa).call(this, e), e = m(this, M, Zr).call(this, e), e = m(this, M, na).call(this, e), e = m(this, M, oa).call(this, e), e = m(this, M, ra).call(this, e), e = m(this, M, aa).call(this, e), e = m(this, M, la).call(this, e), e = m(this, M, ca).call(this, e), e = m(this, M, da).call(this, e)), e);
+    return m(this, x, Hr).call(this, i) ? [m(this, x, Qr).call(this, i)] : (e.length > 1 && (e = m(this, x, ia).call(this, e), e = m(this, x, sa).call(this, e), e = m(this, x, Zr).call(this, e), e = m(this, x, na).call(this, e), e = m(this, x, oa).call(this, e), e = m(this, x, ra).call(this, e), e = m(this, x, aa).call(this, e), e = m(this, x, la).call(this, e), e = m(this, x, ca).call(this, e), e = m(this, x, da).call(this, e)), e);
   }
   /**
    * Splits an array into separate arrays of expressions using the split entity. A split
@@ -6338,32 +6338,32 @@ const Qn = class Qn {
   static connectVariableUsages(i, e) {
     var w, S;
     const n = e.getScope();
-    !i.isBlank() && i.getFirstExpression().is(t.ImportStatement) && m(w = Qn, M, jr).call(w, i, n), i.isBlockStatement() && !i.isBlank() && i.getFirstExpression().is(t.ForDefinitionStatement) && (e = m(S = Qn, M, qr).call(S, e));
+    !i.isBlank() && i.getFirstExpression().is(t.ImportStatement) && m(w = Qn, x, jr).call(w, i, n), i.isBlockStatement() && !i.isBlank() && i.getFirstExpression().is(t.ForDefinitionStatement) && (e = m(S = Qn, x, qr).call(S, e));
     const s = i.getVariableUsages(), o = n.getVariableMap(), a = n.findAllModules(), h = new Map(Array.from(a.values()).flatMap((F) => Array.from(F.getDirectImports()))), p = !i.isBlank() && i.getFirstExpression().is(t.GlobalStatement);
     for (let [F, N] of s) {
       if (e.getBlockEntity() === t.ClassDefinition && N.length > 0 && (N[0].getParent() === void 0 || N[0].getParent().is(t.AssignmentStatement) && N[0].getParent().getTargetVariables().includes(N[0]))) {
-        m(this, M, Ui).call(this, N[0], e.getClassType(), i, e, n);
+        m(this, x, Ui).call(this, N[0], e.getClassType(), i, e, n);
         continue;
       }
       let L = N.map((U) => new Vo(U, e, p));
       if (p && n.addGlobalVar(F), o.has(F)) {
         o.get(F).addUsages(L);
         for (const U of L) {
-          const x = U.getVariable().getParent();
-          if (x && x.is(t.PropertyCallExpression) && x.getObject().getDataType().isCustom) {
-            const ot = x.getObject().getDataType();
-            m(this, M, Ui).call(this, x.getProperty(), ot, i, e, n);
+          const M = U.getVariable().getParent();
+          if (M && M.is(t.PropertyCallExpression) && M.getObject().getDataType().isCustom) {
+            const ot = M.getObject().getDataType();
+            m(this, x, Ui).call(this, M.getProperty(), ot, i, e, n);
           }
         }
       } else {
         if (a.has(F))
           L[0].getVariable().setDataType(fi(a.get(F).getEntity()));
         else if (h.has(F)) {
-          const x = en.has(h.get(F).entity) ? en.get(h.get(F).entity) : d.Unknown;
-          L[0].getVariable().setDataType(x);
+          const M = en.has(h.get(F).entity) ? en.get(h.get(F).entity) : d.Unknown;
+          L[0].getVariable().setDataType(M);
         }
         const U = new Po(L[0], i, e);
-        if (L.length > 1 && U.addUsages(L.slice(1)), m(this, M, Wr).call(this, e, F, U.getUsages()[0].getVariable()) && this.checkIfVariableExistsInParent(U, e))
+        if (L.length > 1 && U.addUsages(L.slice(1)), m(this, x, Wr).call(this, e, F, U.getUsages()[0].getVariable()) && this.checkIfVariableExistsInParent(U, e))
           continue;
         o.set(F, U);
       }
@@ -6491,7 +6491,7 @@ const Qn = class Qn {
   }
   //#endregion
 };
-M = new WeakSet(), Ui = function(i, e, n, s, o) {
+x = new WeakSet(), Ui = function(i, e, n, s, o) {
   const a = i.getTextValue(), h = new Vo(i, s);
   if (e.attributes.has(a))
     e.attributes.get(a).addUsage(h);
@@ -6536,7 +6536,7 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
   for (const h of o)
     s.set(h.getAlias(), h);
 }, Hr = function(i) {
-  return i.length > 0 && i[0].is(c.BlockDefinitions) && !m(this, M, zr).call(this, i);
+  return i.length > 0 && i[0].is(c.BlockDefinitions) && !m(this, x, zr).call(this, i);
 }, zr = function(i) {
   if (i.length === 1) return !1;
   const e = Zt(i, t.AssignmentOperator);
@@ -6545,7 +6545,7 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
   const e = ge(i);
   switch (i[0].getEntity()) {
     case t.FunctionDefinition:
-      return m(this, M, Xr).call(this, e, i);
+      return m(this, x, Xr).call(this, e, i);
     case t.IfDefinition:
       return new rt(e, i, t.IfDefinitionStatement);
     case t.ElifDefinition:
@@ -6574,13 +6574,13 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
 }, Xr = function(i, e) {
   return e.length < 2 || e[1].is(t.FunctionName) ? new ed(i, e) : new td(i, e);
 }, Zr = function(i) {
-  let e = m(this, M, Gi).call(this, i);
+  let e = m(this, x, Gi).call(this, i);
   if (e.sort((o, a) => o[0] - a[0]), e.length === 0)
     return i;
   let n = i, s;
   for (; e.length > 0 && (s === void 0 || e.length !== s.length); ) {
     const o = n[e[0][0]];
-    o.is(t.OpenParenthesis) ? n = m(this, M, Yr).call(this, e[0], n) : o.is(t.OpenSquareBracket) ? n = m(this, M, _r).call(this, e[0], n) : n = m(this, M, ta).call(this, e[0], n), s = e, e = m(this, M, Gi).call(this, n), e.sort((a, h) => a[0] - h[0]);
+    o.is(t.OpenParenthesis) ? n = m(this, x, Yr).call(this, e[0], n) : o.is(t.OpenSquareBracket) ? n = m(this, x, _r).call(this, e[0], n) : n = m(this, x, ta).call(this, e[0], n), s = e, e = m(this, x, Gi).call(this, n), e.sort((a, h) => a[0] - h[0]);
   }
   return n;
 }, Gi = function(i) {
@@ -6607,22 +6607,22 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
 }, Yr = function(i, e) {
   const n = i[0], s = i[1];
   if (n > 0 && e[n - 1].isOneOf([c.BuiltInFunctions, t.FunctionName])) {
-    const a = e[n - 1].is(c.BuiltInFunctions) ? t.BuiltInFunctionCall : t.UserDefinedFunctionCall, h = m(this, M, pe).call(this, e.slice(n - 1, s + 1), a);
+    const a = e[n - 1].is(c.BuiltInFunctions) ? t.BuiltInFunctionCall : t.UserDefinedFunctionCall, h = m(this, x, pe).call(this, e.slice(n - 1, s + 1), a);
     return e.slice(0, n - 1).concat([h], e.slice(s + 1));
   } else if (n > 2 && e[n - 1].isOneOf([c.BuiltInMethods, t.MethodName, c.MagicMethods, c.ModuleFunctions]) && e[n - 2].is(t.Dot)) {
-    const a = e[n - 1].is(t.MethodName) && !e[n - 1].is(c.ModuleFunctions) ? t.UserDefinedMethodCall : t.BuiltInMethodCall, h = m(this, M, pe).call(this, e.slice(n - 3, s + 1), a);
+    const a = e[n - 1].is(t.MethodName) && !e[n - 1].is(c.ModuleFunctions) ? t.UserDefinedMethodCall : t.BuiltInMethodCall, h = m(this, x, pe).call(this, e.slice(n - 3, s + 1), a);
     return e.slice(0, n - 3).concat([h], e.slice(s + 1));
   } else if (n > 0 && e[n - 1].is(t.ExceptionName)) {
-    const a = m(this, M, pe).call(this, e.slice(n - 1, s + 1), t.ExceptionCall);
+    const a = m(this, x, pe).call(this, e.slice(n - 1, s + 1), t.ExceptionCall);
     return e.slice(0, n - 1).concat([a], e.slice(s + 1));
   } else if (s > n + 1) {
     const a = e.slice(n + 1, s), h = this.split(a, t.Comma);
     if (h.length > 1) {
-      const p = m(this, M, pe).call(this, e.slice(n, s + 1), t.TupleDefinition, h);
+      const p = m(this, x, pe).call(this, e.slice(n, s + 1), t.TupleDefinition, h);
       return e.slice(0, n).concat([p], e.slice(s + 1));
     }
   }
-  const o = m(this, M, pe).call(this, e.slice(n, s + 1), t.GroupStatement);
+  const o = m(this, x, pe).call(this, e.slice(n, s + 1), t.GroupStatement);
   return e.slice(0, n).concat([o], e.slice(s + 1));
 }, _r = function(i, e) {
   const n = i[0], s = i[1];
@@ -6640,11 +6640,11 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
     c.OtherKeywords,
     t.ContinuationLine
   ])) {
-    const h = m(this, M, pe).call(this, e.slice(n, s + 1), t.ListDefinition, o);
+    const h = m(this, x, pe).call(this, e.slice(n, s + 1), t.ListDefinition, o);
     return e.slice(0, n).concat([h], e.slice(s + 1));
   } else {
     let h = this.split(a, t.Colon);
-    const p = m(this, M, ea).call(this, h, e, n, s) ? m(this, M, pe).call(this, e.slice(n, s + 1), t.Slice, h) : m(this, M, pe).call(this, e.slice(n, s + 1), t.IndexKey);
+    const p = m(this, x, ea).call(this, h, e, n, s) ? m(this, x, pe).call(this, e.slice(n, s + 1), t.Slice, h) : m(this, x, pe).call(this, e.slice(n, s + 1), t.IndexKey);
     let w = n - 1;
     for (; w >= 0 && !e[w].isOneOf([
       c.Identifiers,
@@ -6659,7 +6659,7 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
     ]); )
       w--;
     w = Math.max(w, 0);
-    const S = m(this, M, pe).call(this, [...e.slice(w, n), p], t.SubscriptedExpression);
+    const S = m(this, x, pe).call(this, [...e.slice(w, n), p], t.SubscriptedExpression);
     return e.slice(0, w).concat([S], e.slice(s + 1));
   }
 }, ea = function(i, e, n, s) {
@@ -6668,14 +6668,14 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
   const n = i[0], s = i[1];
   let o;
   if (s === n + 1)
-    o = m(this, M, pe).call(this, e.slice(n, s + 1), t.DictDefinition);
+    o = m(this, x, pe).call(this, e.slice(n, s + 1), t.DictDefinition);
   else {
     const a = e.slice(n + 1, s), h = this.split(a, t.Comma), p = [];
     for (let w of h) {
       const S = this.split(w, t.Colon);
       S.length === 2 && p.push(S);
     }
-    p.length === h.length ? o = m(this, M, pe).call(this, e.slice(n, s + 1), t.DictDefinition, p) : o = m(this, M, pe).call(this, e.slice(n, s + 1), t.SetDefinition, h);
+    p.length === h.length ? o = m(this, x, pe).call(this, e.slice(n, s + 1), t.DictDefinition, p) : o = m(this, x, pe).call(this, e.slice(n, s + 1), t.SetDefinition, h);
   }
   return e.slice(0, n).concat([o], e.slice(s + 1));
 }, pe = function(i, e, n = []) {
@@ -6716,10 +6716,10 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
       throw new Error("Unknown multipart expression type");
   }
 }, na = function(i) {
-  let e = m(this, M, Ji).call(this, i);
+  let e = m(this, x, Ji).call(this, i);
   for (; e > -1; ) {
-    const n = e > 0 && !i[e - 1].isOneOf([c.MathsOperators, c.LogicalOperators, c.ComparisonOperators, c.OtherKeywords]) ? e - 1 : e, s = m(this, M, pe).call(this, i.slice(n, e + 2), t.CalculatedExpression);
-    i = i.slice(0, n).concat([s], i.slice(e + 2)), e = m(this, M, Ji).call(this, i);
+    const n = e > 0 && !i[e - 1].isOneOf([c.MathsOperators, c.LogicalOperators, c.ComparisonOperators, c.OtherKeywords]) ? e - 1 : e, s = m(this, x, pe).call(this, i.slice(n, e + 2), t.CalculatedExpression);
+    i = i.slice(0, n).concat([s], i.slice(e + 2)), e = m(this, x, Ji).call(this, i);
   }
   return i;
 }, sa = function(i) {
@@ -6764,10 +6764,10 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
   }
   return e.length > 0 ? e[0] : n.length > 0 ? n[0] : -1;
 }, oa = function(i) {
-  let e = m(this, M, $i).call(this, i);
+  let e = m(this, x, $i).call(this, i);
   for (; e > 0; ) {
     let n = e - 1, s;
-    i[e].is(t.InKeyword) && n > 1 && i[n - 1].is(t.Comma) ? (n = n - 2, s = m(this, M, pe).call(this, i.slice(n, e + 2), t.IteratorExpression)) : i[e].is(t.InKeyword) && e === 1 && e + 1 < i.length && i[e + 1].is(t.BuiltInFunctionCall) && i[e + 1].getFunctionExpression().isOneOf([t.EnumerateFunction]) ? (n = 0, s = m(this, M, pe).call(this, i.slice(n, e + 2), t.IteratorExpression)) : s = m(this, M, pe).call(this, i.slice(n, e + 2), t.ComparisonExpression), i = i.slice(0, n).concat([s], i.slice(e + 2)), e = m(this, M, $i).call(this, i);
+    i[e].is(t.InKeyword) && n > 1 && i[n - 1].is(t.Comma) ? (n = n - 2, s = m(this, x, pe).call(this, i.slice(n, e + 2), t.IteratorExpression)) : i[e].is(t.InKeyword) && e === 1 && e + 1 < i.length && i[e + 1].is(t.BuiltInFunctionCall) && i[e + 1].getFunctionExpression().isOneOf([t.EnumerateFunction]) ? (n = 0, s = m(this, x, pe).call(this, i.slice(n, e + 2), t.IteratorExpression)) : s = m(this, x, pe).call(this, i.slice(n, e + 2), t.ComparisonExpression), i = i.slice(0, n).concat([s], i.slice(e + 2)), e = m(this, x, $i).call(this, i);
   }
   return i;
 }, $i = function(i) {
@@ -6776,10 +6776,10 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
       return e;
   return -1;
 }, ra = function(i) {
-  let e = m(this, M, Ki).call(this, i);
+  let e = m(this, x, Ki).call(this, i);
   for (; e > -1; ) {
-    const s = (i[e].is(t.NotOperator) ? 2 : 3) === 2 ? e : e - 1, o = s >= 0 ? i.slice(s, e + 2) : i.slice(e, e + 2), a = m(this, M, pe).call(this, o, t.BooleanExpression);
-    i = s >= 0 ? i.slice(0, s).concat([a], i.slice(e + 2)) : i.slice(0, e).concat([a], i.slice(e + 2)), e = m(this, M, Ki).call(this, i);
+    const s = (i[e].is(t.NotOperator) ? 2 : 3) === 2 ? e : e - 1, o = s >= 0 ? i.slice(s, e + 2) : i.slice(e, e + 2), a = m(this, x, pe).call(this, o, t.BooleanExpression);
+    i = s >= 0 ? i.slice(0, s).concat([a], i.slice(e + 2)) : i.slice(0, e).concat([a], i.slice(e + 2)), e = m(this, x, Ki).call(this, i);
   }
   return i;
 }, Ki = function(i) {
@@ -6804,10 +6804,10 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
   }
   return i;
 }, ca = function(i) {
-  let e = m(this, M, Wi).call(this, i);
+  let e = m(this, x, Wi).call(this, i);
   for (; e > -1; ) {
-    const n = m(this, M, ua).call(this, i, e - 1), s = i.slice(n), o = ge(s), a = i[e].isOneOf([t.AssignmentOperator, t.WalrusOperator]) ? new tl(o, s) : new wd(o, s);
-    i = i.slice(0, n).concat([a]), e = m(this, M, Wi).call(this, i);
+    const n = m(this, x, ua).call(this, i, e - 1), s = i.slice(n), o = ge(s), a = i[e].isOneOf([t.AssignmentOperator, t.WalrusOperator]) ? new tl(o, s) : new wd(o, s);
+    i = i.slice(0, n).concat([a]), e = m(this, x, Wi).call(this, i);
   }
   return i;
 }, ua = function(i, e) {
@@ -6822,7 +6822,7 @@ M = new WeakSet(), Ui = function(i, e, n, s, o) {
   return -1;
 }, da = function(i) {
   return i.length > 0 && (i[0].is(t.ReturnKeyword) ? i = [new yd(ge(i), i)] : i[0].isOneOf([t.ImportKeyword, t.FromKeyword]) ? i = [new Fd(ge(i), i)] : i[0].isOneOf([t.GlobalKeyword, t.AssertKeyword, t.RaiseKeyword]) && (i = [new Nd(ge(i), i)])), i;
-}, b(Qn, M);
+}, b(Qn, x);
 let H = Qn;
 function sn(g, i, e, n, s, o = n + g.length, a = e) {
   switch (i.entity) {
@@ -8157,7 +8157,7 @@ class od extends ee {
   }
   //#endregion - overrides
 }
-var fe, Fe, Ta, xa, zn, Ma, Da, Aa;
+var fe, Fe, Ta, Ma, zn, xa, Da, Aa;
 class Oa extends ee {
   /**
    * Creates a new MethodCallNode
@@ -8182,7 +8182,7 @@ class Oa extends ee {
           u(this, fe)[w].length > 1 && (u(this, fe)[w] = H.createTree(u(this, fe)[w]));
       }
     } else y(this, fe, []);
-    m(this, Fe, xa).call(this), m(this, Fe, Ta).call(this), this.addRules([m(this, Fe, Aa), m(this, Fe, Ma)]), this.addCounterRules([m(this, Fe, Da)]);
+    m(this, Fe, Ma).call(this), m(this, Fe, Ta).call(this), this.addRules([m(this, Fe, Aa), m(this, Fe, xa)]), this.addCounterRules([m(this, Fe, Da)]);
   }
   //#region - overrides
   /**
@@ -8367,7 +8367,7 @@ fe = new WeakMap(), Fe = new WeakSet(), Ta = function() {
 }, /**
  * Helper method that sets this as the parent of all arguments in a function call.
  */
-xa = function() {
+Ma = function() {
   for (const e of u(this, fe))
     for (const n of e)
       n.setParent(this);
@@ -8385,7 +8385,7 @@ zn = function() {
  * @param {MethodCallNode} exp
  * @returns {Symptom[]}
  */
-Ma = function(e) {
+xa = function(e) {
   const n = [], s = e.getMethod();
   return s.getDataType() !== d.None && s.getDataType() !== d.NotParsed && s.getDataType() !== d.Unknown && e.getDataType() !== d.Unknown && e.getDataType() !== d.None && e.getDataType() !== d.NotParsed && (e.getParent() === void 0 || e.getParent().is(t.GroupStatement) && e.getParent().getParent() === void 0) && n.push(O.createStatementSymptom(
     I.UnusedReturn,
@@ -10620,7 +10620,7 @@ Sl = function(e) {
     }));
   return n;
 };
-var xe;
+var Me;
 class bl extends ee {
   // An array storing each part of the slice i.e. the expressions between :
   /**
@@ -10633,11 +10633,11 @@ class bl extends ee {
   constructor(e, n, s = []) {
     super(e, n, t.Slice, c.Other, d.NA);
     /** @type {ExpressionNode[][]} */
-    b(this, xe);
-    y(this, xe, s);
-    for (let o = 0; o < u(this, xe).length; o++) {
-      u(this, xe)[o].length > 1 && (u(this, xe)[o] = H.createTree(u(this, xe)[o]));
-      for (const a of u(this, xe)[o])
+    b(this, Me);
+    y(this, Me, s);
+    for (let o = 0; o < u(this, Me).length; o++) {
+      u(this, Me)[o].length > 1 && (u(this, Me)[o] = H.createTree(u(this, Me)[o]));
+      for (const a of u(this, Me)[o])
         a.setParent(this), this.addConnection(a);
     }
   }
@@ -10654,7 +10654,7 @@ class bl extends ee {
    */
   getVariableExpressions() {
     let e = [];
-    for (let n of u(this, xe))
+    for (let n of u(this, Me))
       for (let s of n)
         e = e.concat(s.getVariableExpressions());
     return e;
@@ -10664,7 +10664,7 @@ class bl extends ee {
    */
   checkForSymptoms() {
     this.checkRules(this);
-    for (const e of u(this, xe))
+    for (const e of u(this, Me))
       for (const n of e)
         n.checkForSymptoms();
   }
@@ -10673,7 +10673,7 @@ class bl extends ee {
    */
   checkForCounterRules(e) {
     super.checkForCounterRules(e);
-    for (const n of u(this, xe))
+    for (const n of u(this, Me))
       for (const s of n)
         s.checkForCounterRules(s);
   }
@@ -10706,11 +10706,11 @@ class bl extends ee {
    * @inheritdoc
    */
   getAllNestedExpressions() {
-    return [...super.getAllNestedExpressions(), ...u(this, xe).flatMap((n) => n.flatMap((s) => s.getAllNestedExpressions()))];
+    return [...super.getAllNestedExpressions(), ...u(this, Me).flatMap((n) => n.flatMap((s) => s.getAllNestedExpressions()))];
   }
   toJSON() {
     const e = super.toJSON();
-    return e.indices = u(this, xe).map((n) => n.map((s) => s.toJSON())), e;
+    return e.indices = u(this, Me).map((n) => n.map((s) => s.toJSON())), e;
   }
   //#endregion - overrides
   //#region - extension
@@ -10719,11 +10719,11 @@ class bl extends ee {
    * @returns {ExpressionNode[][]}
    */
   getIndices() {
-    return u(this, xe);
+    return u(this, Me);
   }
   //#endregion - extension
 }
-xe = new WeakMap();
+Me = new WeakMap();
 var nt;
 class Il extends ee {
   /**
@@ -10908,7 +10908,7 @@ Fl = function(e) {
   return d.Unknown;
 }, b(Zn, Cs);
 let Xs = Zn;
-var je, Nl, st, Zi, Yi, Cl, Ol, Tl, xl, Ml;
+var je, Nl, st, Zi, Yi, Cl, Ol, Tl, Ml, xl;
 const Bt = class Bt extends ee {
   /**
    * Creates a new CalculatedExpression
@@ -10921,7 +10921,7 @@ const Bt = class Bt extends ee {
     let s = n.length === 3 ? m(o = Bt, st, Zi).call(o, ...n) : n.length === 2 ? m(a = Bt, st, Yi).call(a, n[1]) : d.Unknown;
     super(e, n, t.CalculatedExpression, c.MultipartValue, s);
     b(this, je);
-    n.length === 3 ? (n[0] !== void 0 && n[0].addObserver(this), n[2] !== void 0 && n[2].addObserver(this)) : n.length > 0 && n[1] !== void 0 && n[1].addObserver(this), m(this, je, Nl).call(this), this.addRules([m(this, je, Ml), m(this, je, xl), m(this, je, Tl), m(this, je, Ol)]);
+    n.length === 3 ? (n[0] !== void 0 && n[0].addObserver(this), n[2] !== void 0 && n[2].addObserver(this)) : n.length > 0 && n[1] !== void 0 && n[1].addObserver(this), m(this, je, Nl).call(this), this.addRules([m(this, je, xl), m(this, je, Ml), m(this, je, Tl), m(this, je, Ol)]);
   }
   //#region - overrides
   /**
@@ -11009,7 +11009,7 @@ Tl = function(e) {
  * @param {CalculatedExpression} calc
  * @returns {Symptom[]}
  */
-xl = function(e) {
+Ml = function(e) {
   const n = [], s = e.getChildren();
   return e.getDataType() === d.Invalid && s.filter((o) => o.getDataType() === d.Undefined || o.getDataType() === d.Invalid).length === 0 && n.push(O.createStatementSymptom(I.TypeErrorInvalid, s, 0, s.length - 1, {
     parts: s.map((o) => o.getDataType() === d.NA ? o.getTextValue() : o.getDataType().name)
@@ -11020,7 +11020,7 @@ xl = function(e) {
  * @param {CalculatedExpression} exp
  * @returns {Symptom[]}
  */
-Ml = function(e) {
+xl = function(e) {
   const n = [], a = e.getChildren().flatMap((h) => h.is(t.GroupStatement) ? h.getContents() : h).filter((h) => tn(h) || h.getDataType() === d.None && !h.isOneOf([t.NoneType, t.VariableName]));
   return a.length > 0 && n.push(...a.map((h) => O.createStatementSymptom(
     I.AssignedNone,
@@ -11310,7 +11310,7 @@ Rl = function(e) {
   return n;
 }, b(_n, Ts);
 let to = _n;
-var yn, ce, ie, Me, El, Ul, Gl, so, Jl, $l;
+var yn, ce, ie, xe, El, Ul, Gl, so, Jl, $l;
 class Oo extends ee {
   /**
    * Creates a new IteratorExpression 
@@ -11320,14 +11320,14 @@ class Oo extends ee {
    */
   constructor(e, n) {
     super(e, n, t.IteratorExpression, c.MultipartValue, d.NA);
-    b(this, Me);
+    b(this, xe);
     /** @type {Number} */
     b(this, yn);
     /** @type {ExpressionNode} */
     b(this, ce);
     /** @type {ExpressionNode[]} */
     b(this, ie, []);
-    m(this, Me, Ul).call(this), m(this, Me, El).call(this), this.addRules([m(this, Me, $l), m(this, Me, Jl)]);
+    m(this, xe, Ul).call(this), m(this, xe, El).call(this), this.addRules([m(this, xe, $l), m(this, xe, Jl)]);
   }
   /**
    * @override
@@ -11357,7 +11357,7 @@ class Oo extends ee {
   }
   /** @override */
   setDataType(e) {
-    m(this, Me, so).call(this);
+    m(this, xe, so).call(this);
   }
   /**
    * @override
@@ -11387,7 +11387,7 @@ class Oo extends ee {
   }
   //#endregion - extensions
 }
-yn = new WeakMap(), ce = new WeakMap(), ie = new WeakMap(), Me = new WeakSet(), El = function() {
+yn = new WeakMap(), ce = new WeakMap(), ie = new WeakMap(), xe = new WeakSet(), El = function() {
   const e = this.getChildren();
   for (let n = 0; n < e.length; n++)
     this.addConnection(e[n]), n < e.length - 1 && e[n].addConnection(e[n + 1]);
@@ -11398,7 +11398,7 @@ Ul = function() {
   y(this, yn, Zt(e, t.InKeyword)), y(this, ce, e[e.length - 1]), y(this, ie, u(this, yn) === 1 && e[0].is(t.TupleDefinition) ? e[0].getElements().filter((n) => n[0].is(t.VariableName)).map((n) => n[0]) : e.slice(0, u(this, yn)).filter((n) => n.is(t.VariableName)));
   for (let n of u(this, ie))
     n.setAssignedOrChanged();
-  m(this, Me, Gl).call(this);
+  m(this, xe, Gl).call(this);
 }, Gl = function() {
   if (u(this, ce).isOneOf([t.BuiltInFunctionCall, t.BuiltInMethodCall])) {
     const e = u(this, ce).is(t.BuiltInMethodCall) ? u(this, ce).getMethodEntity() : u(this, ce).getFunctionEntity();
@@ -11420,7 +11420,7 @@ Ul = function() {
       for (const n of u(this, ie))
         n.setDataType(d.Unknown);
   } else
-    u(this, ce).addObserver(this), m(this, Me, so).call(this);
+    u(this, ce).addObserver(this), m(this, xe, so).call(this);
 }, so = function() {
   const e = u(this, ce).getDataType() === d.String || u(this, ce).getDataType() === d.File ? d.String : d.Unknown;
   for (let n of u(this, ie))
@@ -11466,7 +11466,7 @@ $l = function(e) {
     }));
   return n;
 };
-var xs, Ms;
+var Ms, xs;
 class Id extends ee {
   /**
    * Creates a new BooleanExpression 
@@ -11489,10 +11489,10 @@ class Id extends ee {
       throw new Error("Lambda can only have one return value");
     super(e, n, t.LambdaDefinitionStatement, c.BlockDefinitions, a[0].getDataType());
     /** @type {ExpressionNode[][]} */
-    b(this, xs);
-    /** @type {ExpressionNode} */
     b(this, Ms);
-    y(this, xs, o), y(this, Ms, a[0]), a[0].addObserver(this);
+    /** @type {ExpressionNode} */
+    b(this, xs);
+    y(this, Ms, o), y(this, xs, a[0]), a[0].addObserver(this);
   }
   /**
    * @override
@@ -11511,10 +11511,10 @@ class Id extends ee {
   }
   toJSON() {
     const e = super.toJSON();
-    return e.arguments = u(this, xs).map((n) => n.map((s) => s.toJSON())), e.return = u(this, Ms).toJSON(), e;
+    return e.arguments = u(this, Ms).map((n) => n.map((s) => s.toJSON())), e.return = u(this, xs).toJSON(), e;
   }
 }
-xs = new WeakMap(), Ms = new WeakMap();
+Ms = new WeakMap(), xs = new WeakMap();
 var Ds, oo, Gn, Kl, Wl;
 const es = class es extends ee {
   /**
@@ -12132,7 +12132,7 @@ nc = function(e) {
 sc = function(e) {
   const n = e.getFirstExpression().getExpressionsOfKind(t.AssignmentStatement), s = [];
   for (const o of n)
-    o.getExpressionsOfKind(t.WalrusOperator).length === 0 && s.push(O.createStatementSymptom(I.AssignmentInBoolean, [o], 0, 0, {
+    o.getExpressionsOfKind(t.WalrusOperator).length === 0 && o.getParent() !== void 0 && !o.getParent().isOneOf([c.MethodCall, c.FunctionCall]) && s.push(O.createStatementSymptom(I.AssignmentInBoolean, [o], 0, 0, {
       parentText: e.getRawText()
     }));
   return s;
@@ -12528,14 +12528,14 @@ const Td = (g, i, e) => {
     a.length > 0 && n.set(s, Ys.create(s, a));
   }
   return n;
-}, xd = (g, i, e) => {
+}, Md = (g, i, e) => {
   let n = /* @__PURE__ */ new Map();
   for (let [s, o] of yh) {
     const a = o(g, i, e);
     a.length > 0 && n.set(s, Ys.create(s, a));
   }
   return n;
-}, Md = (g) => g.filter((e) => e.getID() === I.AssignmentInBoolean.name).map((e) => new V(e.getLineNumber(), e.getDocIndex(), new k(
+}, xd = (g) => g.filter((e) => e.getID() === I.AssignmentInBoolean.name).map((e) => new V(e.getLineNumber(), e.getDocIndex(), new k(
   [e],
   "A single equals operator is used in a boolean expression where a double equals operator might be expected."
 ))), Dd = (g) => {
@@ -13118,7 +13118,7 @@ const Td = (g, i, e) => {
   "A loop contains a return that is inside a conditional."
 )));
 var Cn, Vs, Ht;
-const xo = class xo {
+const Mo = class Mo {
   // All occurrences of the misconception.
   /**
    * Creates a new Misconception
@@ -13181,12 +13181,12 @@ const xo = class xo {
    * @returns {Misconception} A new misconception
    */
   static create(i, e) {
-    return new xo(i, e);
+    return new Mo(i, e);
   }
 };
 Cn = new WeakMap(), Vs = new WeakMap(), Ht = new WeakMap();
-let Ys = xo;
-var On, Tn, xn;
+let Ys = Mo;
+var On, Tn, Mn;
 class V {
   // A description of the relevant symptoms, tailored to the specific occurrence
   /**
@@ -13203,8 +13203,8 @@ class V {
     b(this, Tn);
     // The index in the document's raw text
     /** @type {Reason} */
-    b(this, xn);
-    y(this, On, i), y(this, Tn, e), y(this, xn, n);
+    b(this, Mn);
+    y(this, On, i), y(this, Tn, e), y(this, Mn, n);
   }
   /**
    * Gets the document line number
@@ -13225,7 +13225,7 @@ class V {
    * @returns {Reason} The Reason object that contains more information about the occurrence
    */
   getReason() {
-    return u(this, xn);
+    return u(this, Mn);
   }
   /**
    * Creates a JSON-friendly representation of the Misconception
@@ -13235,12 +13235,12 @@ class V {
     return {
       line: u(this, On),
       docIndex: u(this, Tn),
-      reason: u(this, xn).toJSON()
+      reason: u(this, Mn).toJSON()
     };
   }
 }
-On = new WeakMap(), Tn = new WeakMap(), xn = new WeakMap();
-var Mn, Ls;
+On = new WeakMap(), Tn = new WeakMap(), Mn = new WeakMap();
+var xn, Ls;
 class k {
   /**
    * Creates a new Reason.
@@ -13249,13 +13249,13 @@ class k {
    */
   constructor(i, e) {
     /** @type {Symptom[]} */
-    b(this, Mn);
+    b(this, xn);
     /** @type {String} */
     b(this, Ls);
-    y(this, Mn, i), y(this, Ls, e);
+    y(this, xn, i), y(this, Ls, e);
   }
   getContributingSymptoms() {
-    return u(this, Mn);
+    return u(this, xn);
   }
   /**
    * Creates a JSON representation of the reason.
@@ -13263,12 +13263,12 @@ class k {
    */
   toJSON() {
     return {
-      contributingSymptoms: u(this, Mn).map((i) => i.toJSON()),
+      contributingSymptoms: u(this, xn).map((i) => i.toJSON()),
       explanation: u(this, Ls)
     };
   }
 }
-Mn = new WeakMap(), Ls = new WeakMap();
+xn = new WeakMap(), Ls = new WeakMap();
 const Ih = /* @__PURE__ */ new Map([
   [R.PrintSameAsReturn, qd],
   [R.UnusedReturn, jd],
@@ -13280,7 +13280,7 @@ const Ih = /* @__PURE__ */ new Map([
   [R.ParenthesesOnlyIfArgument, Wd],
   [R.FunctionCallsUseSquareBrackets, Ld],
   [R.FunctionCallsNoParentheses, Vd],
-  [R.AssignCompares, Md],
+  [R.AssignCompares, xd],
   [R.ReturnCall, Hd],
   [R.SequentialIfsAreExclusive, zd],
   [R.WhileSameAsIf, _d],
@@ -13471,7 +13471,7 @@ uo = function(i) {
 mc = function(i, e) {
   u(this, An).get(i).add(e);
 };
-var Rs, Le, ye, E, wc, Dt, Sc, bc, Ic, yc, Fc, Nc, Cc, Oc, Tc, xc, ho, fo, Mc, Dc, Ac, Bc, kc, Pc, on;
+var Rs, Le, ye, E, wc, Dt, Sc, bc, Ic, yc, Fc, Nc, Cc, Oc, Tc, Mc, ho, fo, xc, Dc, Ac, Bc, kc, Pc, on;
 class Nh {
   /**
    * Creates a new DocInfo object from Python raw text
@@ -13549,7 +13549,7 @@ class Nh {
    * @returns {Map<ConceptType, Misconception} A Map of all concepts found in the document
    */
   getConcepts() {
-    return xd(O.counterSymptoms, O.symptoms, this.getUserDefinedFunctions());
+    return Md(O.counterSymptoms, O.symptoms, this.getUserDefinedFunctions());
   }
   /**
    * Gets the raw text in the document.
@@ -13747,7 +13747,7 @@ Oc = function() {
         if (this.userDefinedFunctions.has(s[0])) {
           const a = this.userDefinedFunctions.get(s[0]);
           a.addObserver(o), o.setDataType(a.getReturnType());
-        } else m(this, E, xc).call(this, s[0], e) ? o.convertToImportedFunction() : (o.setDataType(d.Unknown), O.symptoms.push(O.createStatementSymptom(I.UnknownFunction, [o], 0, 0)));
+        } else m(this, E, Mc).call(this, s[0], e) ? o.convertToImportedFunction() : (o.setDataType(d.Unknown), O.symptoms.push(O.createStatementSymptom(I.UnknownFunction, [o], 0, 0)));
   }
 }, /**
  * Helper method to handle any calls to unknown functions
@@ -13777,7 +13777,7 @@ Tc = function() {
  * @param {ScopeBlock} scopeBlock 
  * @returns {Boolean}
  */
-xc = function(i, e) {
+Mc = function(i, e) {
   let n = e;
   for (; n !== void 0; ) {
     if (n.getModuleMap().has(i) || Array.from(n.getModuleMap().values()).filter((s) => s.hasDirectImport(i)).length > 0)
@@ -13808,10 +13808,10 @@ fo = function(i, e) {
     const n = i.getFirstExpression(), s = i.getIndentation(), o = n.getStartLineNumber();
     let a;
     const h = m(this, E, Ac).call(this, i);
-    e.isScopeBlock() || (a = e.getScope().getStatementToUpdate(s, o)), n.isOneOf([t.FunctionDefinitionStatement, t.MethodDefinitionStatement]) ? (e = m(this, E, kc).call(this, e, i, s), n.is(t.MethodDefinitionStatement) && m(this, E, Dc).call(this, e, n)) : n.is(t.ClassDefinitionStatement) ? e = m(this, E, Pc).call(this, e, i, s) : n.is(c.BlockDefinitionStatement) && !n.is(t.TernaryStatement) ? e = m(this, E, Bc).call(this, e, i, s, a) : a !== void 0 ? (e = m(this, E, on).call(this, s, e, o), a.addStatement(i, e)) : (e = m(this, E, on).call(this, s, e, o), e.addStatement(i)), h.length > 0 && m(this, E, Mc).call(this, h, e);
+    e.isScopeBlock() || (a = e.getScope().getStatementToUpdate(s, o)), n.isOneOf([t.FunctionDefinitionStatement, t.MethodDefinitionStatement]) ? (e = m(this, E, kc).call(this, e, i, s), n.is(t.MethodDefinitionStatement) && m(this, E, Dc).call(this, e, n)) : n.is(t.ClassDefinitionStatement) ? e = m(this, E, Pc).call(this, e, i, s) : n.is(c.BlockDefinitionStatement) && !n.is(t.TernaryStatement) ? e = m(this, E, Bc).call(this, e, i, s, a) : a !== void 0 ? (e = m(this, E, on).call(this, s, e, o), a.addStatement(i, e)) : (e = m(this, E, on).call(this, s, e, o), e.addStatement(i)), h.length > 0 && m(this, E, xc).call(this, h, e);
   }
   return e;
-}, Mc = function(i, e) {
+}, xc = function(i, e) {
   for (let n of i) {
     const s = new Yu(e, n);
     e.addChildBlock(s);
@@ -13856,8 +13856,8 @@ Bc = function(i, e, n, s) {
   if (o.isBlockStatement() && (p || w)) {
     const S = s ? s.getStatements() : h.getStatements(), F = S[S.length - 1], N = p ? [t.IfDefinitionStatement, t.ElifDefinitionStatement, t.ElseDefinitionStatement] : [t.TryDefinitionStatement];
     if (F !== void 0 && F.isBlockStatement() && F.getFirstExpression().isOneOf(N)) {
-      const L = h.getChildBlocks(), U = L[L.length - 1], x = U.getBlockEntity();
-      if (p && (x === t.IfDefinition || x === t.ElifDefinition) || w && x === t.TryDefinition) {
+      const L = h.getChildBlocks(), U = L[L.length - 1], M = U.getBlockEntity();
+      if (p && (M === t.IfDefinition || M === t.ElifDefinition) || w && M === t.TryDefinition) {
         const ot = U.getSiblingConditionalBranches();
         for (const Us of ot)
           a.addSibling(Us), Us.addSibling(a);
@@ -13940,10 +13940,10 @@ const Ch = (g) => g.hasOwnProperty("reason") && g.reason.hasOwnProperty("contrib
             i.push(Th(g.type, e));
             break;
           case R.ColonAssigns.name:
-            i.push(xh(g.type, e));
+            i.push(Mh(g.type, e));
             break;
           case R.CompareMultipleValuesWithOr.name:
-            i.push(Mh(g.type, e));
+            i.push(xh(g.type, e));
             break;
           case R.ComparisonWithBoolLiteral.name:
             i.push(Dh(g.type, e));
@@ -14016,16 +14016,16 @@ const Ch = (g) => g.hasOwnProperty("reason") && g.reason.hasOwnProperty("contrib
 }, re = (g, i) => `?miscon=${g}&lineNumber=${i.line + 1}`, Th = (g, i) => {
   const e = i.reason.contributingSymptoms[0], n = i.docIndex, s = e.text, o = "Should this = be == ?", a = `${re(g, i)}&text=${s}&parentText=${e.parentText}`;
   return new _(g, n, s, o, a);
-}, xh = (g, i) => {
+}, Mh = (g, i) => {
   const e = i.reason.contributingSymptoms[0], n = i.docIndex, s = e.text, o = "Should this : be = ?", a = `${re(g, i)}&text=${s}&variableName=${e.before.value}&assignedValue=${e.after.value}`;
   return new _(g, n, s, o, a);
-}, Mh = (g, i) => {
+}, xh = (g, i) => {
   const e = "NA", n = i.docIndex, s = i.reason.contributingSymptoms[0].text ? i.reason.contributingSymptoms[0].text : e, o = i.reason.contributingSymptoms[0].completeBooleanExpression ? `${i.reason.contributingSymptoms[0].completeBooleanExpression} will always be True` : "This boolean expression will always be True";
   let a = e, h = e, p = e;
   const w = [], S = [], F = [], N = [], L = [];
-  for (const x of i.reason.contributingSymptoms)
-    dt(x, I.NaturalLanguageBoolean.name) && (x.completeBooleanExpression && (a = x.completeBooleanExpression), x.parentText && (h = x.parentText), x.parentEntity && (p = x.parentEntity), x.rightSideEntity && (x.rightSideEntity === t.ComparisonExpression.name && (w.length === 0 || w[0] !== x.rightSideText) ? w.unshift(x.rightSideText) : x.rightSideEntity !== t.BooleanExpression.name && (S.length === 0 || S[0] !== x.rightSideText) && (S.unshift(x.rightSideText), N.unshift(x.rightSideEntity), F.unshift(x.rightSideType))), x.leftSideEntity && (x.leftSideEntity === t.ComparisonExpression.name ? w.unshift(x.leftSideText) : x.leftSideEntity !== t.BooleanExpression.name && (S.unshift(x.leftSideText), N.unshift(x.leftSideEntity), F.unshift(x.leftSideType))), L.unshift(x.operator));
-  const U = `${re(g, i)}&booleanExpressionText=${a}&parentText=${h}&parentEntity=${p}&${w.map((x) => "comparisonText=" + x).join("&")}&${S.map((x) => "otherText=" + x).join("&")}&${N.map((x) => "otherEntity=" + x).join("&")}&${F.map((x) => "otherType=" + x).join("&")}&${L.map((x) => "operator=" + x).join("&")}}`;
+  for (const M of i.reason.contributingSymptoms)
+    dt(M, I.NaturalLanguageBoolean.name) && (M.completeBooleanExpression && (a = M.completeBooleanExpression), M.parentText && (h = M.parentText), M.parentEntity && (p = M.parentEntity), M.rightSideEntity && (M.rightSideEntity === t.ComparisonExpression.name && (w.length === 0 || w[0] !== M.rightSideText) ? w.unshift(M.rightSideText) : M.rightSideEntity !== t.BooleanExpression.name && (S.length === 0 || S[0] !== M.rightSideText) && (S.unshift(M.rightSideText), N.unshift(M.rightSideEntity), F.unshift(M.rightSideType))), M.leftSideEntity && (M.leftSideEntity === t.ComparisonExpression.name ? w.unshift(M.leftSideText) : M.leftSideEntity !== t.BooleanExpression.name && (S.unshift(M.leftSideText), N.unshift(M.leftSideEntity), F.unshift(M.leftSideType))), L.unshift(M.operator));
+  const U = `${re(g, i)}&booleanExpressionText=${a}&parentText=${h}&parentEntity=${p}&${w.map((M) => "comparisonText=" + M).join("&")}&${S.map((M) => "otherText=" + M).join("&")}&${N.map((M) => "otherEntity=" + M).join("&")}&${F.map((M) => "otherType=" + M).join("&")}&${L.map((M) => "operator=" + M).join("&")}}`;
   return new _(g, n, s, o, U);
 }, Dh = (g, i) => {
   const e = i.reason.contributingSymptoms[0], n = i.docIndex, s = e.text, o = e.boolValue, a = e.boolLiteral, h = a === "True" ? `${o} is boolean so == True is not needed` : `${s} is the same as not ${o}`, p = `${re(g, i)}&text=${s}&boolValue=${o}&boolLiteral=${a}`;
@@ -14038,8 +14038,8 @@ const Ch = (g) => g.hasOwnProperty("reason") && g.reason.hasOwnProperty("contrib
     if (!dt(p, I.SequentialIfs.name))
       continue;
     const w = p.branchMatches.flat();
-    w.forEach((x) => {
-      s.add(x.lineNum + 1);
+    w.forEach((M) => {
+      s.add(M.lineNum + 1);
     });
     const S = w[0].docIndex - p.docIndex, F = S, N = w[w.length - 1].docIndex - w[0].docIndex + S, L = n.substring(N).indexOf(`
 `), U = L > -1 ? N + L : n.length;
@@ -14151,7 +14151,7 @@ const Ch = (g) => g.hasOwnProperty("reason") && g.reason.hasOwnProperty("contrib
     N.push("Getting symptom information");
     const U = i ? Qh(L) : [];
     N.push("Getting counter symptom information");
-    const x = n ? Zh(L) : [];
+    const M = n ? Zh(L) : [];
     N.push("Getting variable information");
     const ot = a ? ef(L) : [];
     N.push("Getting function information");
@@ -14163,19 +14163,19 @@ const Ch = (g) => g.hasOwnProperty("reason") && g.reason.hasOwnProperty("contrib
     N.push("Getting concept information");
     const Rc = s ? Yh(L) : [];
     N.push("Getting block information");
-    const Mo = o ? _h(L) : [], wi = {
+    const xo = o ? _h(L) : [], wi = {
       misconceptions: vc,
       concepts: Rc,
       symptoms: U,
-      counterSymptoms: x,
-      blocks: Mo,
+      counterSymptoms: M,
+      blocks: xo,
       //blocks.toJSON(),
       variables: ot,
       functions: Us,
       classes: Lc
     };
     if (w) {
-      const Si = Mo.toTree();
+      const Si = xo.toTree();
       wi.tree = Si;
     }
     if (S) {
