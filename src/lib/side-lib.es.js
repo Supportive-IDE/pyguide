@@ -7547,7 +7547,7 @@ fa = function(e) {
   const n = [], s = e.getChildren();
   if (s.length > 1) {
     const o = Ze(s[1].getTextValue()).category;
-    (o === c.BlockDefinitions || o === c.LogicalOperators || o === c.Types || o === c.OtherKeywords) && n.push(O.createStatementSymptom(
+    (o === c.BlockDefinitions || o === c.LogicalOperators || o === c.Types || o === c.OtherKeywords && !t.R && !t.F) && n.push(O.createStatementSymptom(
       I.DefinitionFollowedByReservedWord,
       s,
       0,
@@ -12522,19 +12522,21 @@ dc = function(e, n) {
   return s;
 };
 const Td = (g, i, e) => {
-  let n = /* @__PURE__ */ new Map();
-  for (let [s, o] of Ih) {
-    const a = o(g, i, e);
-    a.length > 0 && n.set(s, Ys.create(s, a));
+  const n = g.filter((o) => o.getBlock() !== "unknown");
+  let s = /* @__PURE__ */ new Map();
+  for (let [o, a] of Ih) {
+    const h = a(n, i, e);
+    h.length > 0 && s.set(o, Ys.create(o, h));
   }
-  return n;
+  return s;
 }, Md = (g, i, e) => {
-  let n = /* @__PURE__ */ new Map();
-  for (let [s, o] of yh) {
-    const a = o(g, i, e);
-    a.length > 0 && n.set(s, Ys.create(s, a));
+  const n = g.filter((a) => a.getBlock() !== "unknown"), s = i.filter((a) => a.getBlock() !== "unknown");
+  let o = /* @__PURE__ */ new Map();
+  for (let [a, h] of yh) {
+    const p = h(n, s, e);
+    p.length > 0 && o.set(a, Ys.create(a, p));
   }
-  return n;
+  return o;
 }, xd = (g) => g.filter((e) => e.getID() === I.AssignmentInBoolean.name).map((e) => new V(e.getLineNumber(), e.getDocIndex(), new k(
   [e],
   "A single equals operator is used in a boolean expression where a double equals operator might be expected."

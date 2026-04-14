@@ -39,6 +39,8 @@ This extension contributes the following settings:
 This extension can only detect issues that are task independent—it cannot detect logic errors or strategic errors that would require knowledge of what you are working on. It is intended for beginner programmers so may not work with more advanced concepts and syntax.
 
 ## Release Notes
+### 0.5.2
+Updated to version 3.0.3 of SIDE-lib, which should reduce the number of false positive misconceptions detected.
 
 ### 0.5.1
 Fixed a user-reported bug relating to use of named parameters inside function or method calls inside of a boolean expression.

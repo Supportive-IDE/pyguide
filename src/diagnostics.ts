@@ -8,13 +8,14 @@ import {
     EventEmitter, Event,
     ConfigurationChangeEvent,
     StatusBarItem, StatusBarAlignment,
-    Disposable
+    Disposable,
+    ConfigurationTarget
 } from 'vscode';
 const sideLib = require('./lib/side-lib.es.js');
 import { Feedback, SideLibResult } from './types';
 import { CODELENS_EXTERNAL_FEEDBACK, DIAGNOSTIC_EXTERNAL_FEEDBACK, EXTENSION_ID, EventTypes, REQUEST_USER_INPUT, RUN_PYGUIDE_DIAGNOSTICS, SHOW_CODE_LENS, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators, warningIndicators } from './utils';
 import { Logger } from './logging';
-import { clear } from 'console';
+
 
 // Stores the parameters associated with each diagnostic
 export const paramsMap = new Map<string, string>();
