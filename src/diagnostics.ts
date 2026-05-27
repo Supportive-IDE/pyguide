@@ -35,7 +35,7 @@ export function refreshDiagnostics(doc: TextDocument,
     eventType: EventTypes | undefined = undefined,
     forceRefresh: boolean = false
 ): void {
-    if (doc.languageId === 'python') {
+    if (doc.languageId === 'python' && doc.fileName.endsWith('.py')) {
         // set up
         const diagnostics: Diagnostic[] = [];
         const codeLenses: CodeLens[] = [];
@@ -178,7 +178,7 @@ export function subscribeToDocumentChanges(context: ExtensionContext, sideDiagno
         refreshDiagnostics(window.activeTextEditor.document, 
                            sideDiagnostics, sideLens,
                            logger);
-        if (window.activeTextEditor.document.languageId === 'python') {
+        if (window.activeTextEditor.document.languageId === 'python' && window.activeTextEditor.document.fileName.endsWith('.py')) {
             sideLens.refreshStatusBarButton(true);
         } else {
             sideLens.refreshStatusBarButton(false);
@@ -188,7 +188,7 @@ export function subscribeToDocumentChanges(context: ExtensionContext, sideDiagno
 		window.onDidChangeActiveTextEditor(editor => {
 			if (editor) {
                 refreshDiagnostics(editor.document, sideDiagnostics, sideLens, logger);
-                if (editor.document.languageId === 'python') {
+                if (editor.document.languageId === 'python' && editor.document.fileName.endsWith('.py')) {
                     sideLens.refreshStatusBarButton(true);
                 } else {
                     sideLens.refreshStatusBarButton(false);
