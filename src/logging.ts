@@ -3,7 +3,7 @@ import axios from 'axios';
 import { v4 as uuidV4 } from 'uuid';
 import { EXTENSION_ID, EXTENSION_PUBLISHER, EventTypes, FEEDBACK_RECEIVED_FOR, PRIVACY, RESEARCH_PROMPT_SENT, SHOW_CODE_LENS, UNREGISTERED, createCommand } from './utils';
 import { API_URL } from './urls';
-import { Feedback, Misconception, MisconceptionOccurrence, SideLibResult } from './types';
+import { Feedback, Misconception, MisconceptionOccurrence, SideLibResult, UserDefinedFunction, Block } from './types';
 import { timeStamp } from 'console';
 
 
@@ -336,6 +336,36 @@ class FeedbackEvent extends AbstractEvent {
 
 }
 
+class FunctionEvent extends AbstractEvent {
+    private docIndex: number;
+    private name: string;
+    private block: string;
+    private parameters: string[];
+    private returnTypes: string[];
+
+    constructor(eventID: number, docIndex: number, name: string, block: string, parameters: string[], returnTypes: string[]) {
+        super(eventID, `${eventID}-${name}-${docIndex}`);
+        this.docIndex = docIndex;
+        this.name = name;
+        this.block = block;
+        this.parameters = parameters;
+        this.returnTypes = returnTypes;
+    }
+
+    toLogFormat(clientID: string, sessionID: string): {} {
+        return {
+            clientID, sessionID,
+            uniqueID: this.getUniqueID(),
+            eventID: this.getEventID(),
+            docIndex: this.docIndex,
+            name: this.name,
+            block: this.block,
+            parameters: this.parameters,
+            returnTypes: this.returnTypes
+        };
+    }
+}
+
 /**
  * Describes an event where the user has clicked on a feedback action
  */
@@ -375,6 +405,7 @@ class FileLog {
     private conceptV2Events: MisconceptionV2Event[];
     private feedbackEvents: FeedbackEvent[];
     private feedbackActionEvents: FeedbackActionEvent[];
+    private functionEvents: FunctionEvent[];
 
     constructor(clientID: string) {
         this.clientID = clientID;
@@ -384,6 +415,7 @@ class FileLog {
         this.conceptV2Events = [];
         this.feedbackEvents = [];
         this.feedbackActionEvents = [];
+        this.functionEvents = [];
         // Log new session
         if (clientID !== UNREGISTERED) {
             this.startSession();
@@ -399,7 +431,8 @@ class FileLog {
             try {
                 const extConfig = extensions.getExtension(`${EXTENSION_PUBLISHER}.${EXTENSION_ID}`);
                 const versionNum = extConfig !== undefined ? extConfig.packageJSON.version : "";
-                await axios.put(`${API_URL}/sessionV2`, { clientID: this.clientID, sessionID: this.sessionID, extensionVersion: versionNum});
+                const isCodeLensEnabled = workspace.getConfiguration().get(createCommand(SHOW_CODE_LENS)) as boolean;
+                await axios.put(`${API_URL}/sessionV2`, { clientID: this.clientID, sessionID: this.sessionID, extensionVersion: versionNum, showCodeLens:isCodeLensEnabled});
             } catch (error) {
                 console.log("PyGuide couldn't start a logging session:", error);
             }
@@ -475,6 +508,10 @@ class FileLog {
      */
     addFeedbackAction(eventID: number, feedbackParams: string, actionSource: string) {
         this.feedbackActionEvents.push(new FeedbackActionEvent(eventID, feedbackParams, actionSource));
+    }
+
+    addFunction(eventID: number, functionInfo: UserDefinedFunction, docIndex: number) {
+        this.functionEvents.push(new FunctionEvent(eventID, docIndex, functionInfo.name, functionInfo.block, functionInfo.parameters, functionInfo.returnTypes))
     }
 
 
@@ -554,8 +591,9 @@ class FileLog {
             const feedback = this.prepareToSend(this.feedbackEvents);
             const feedbackActions = this.prepareToSend(this.feedbackActionEvents);
             const concepts = this.prepareToSend(this.conceptV2Events);
-            if (interactions.length > 0 || misconceptions.length > 0 || feedback.length > 0 || feedbackActions.length > 0 || concepts.length > 0) {
-                const response = (await axios.put(`${API_URL}/storeV2`, { interactions, misconceptions, feedback, feedbackActions, concepts})).data as {
+            const functions = this.prepareToSend(this.functionEvents);
+            if (interactions.length > 0 || misconceptions.length > 0 || feedback.length > 0 || feedbackActions.length > 0 || concepts.length > 0 || functions.length > 0) {
+                const response = (await axios.put(`${API_URL}/storeV2`, { interactions, misconceptions, feedback, feedbackActions, concepts, functions})).data as {
                     savedEdits: string[], 
                     failedEdits: string[], 
                     savedMisconceptions: string[], 
@@ -565,7 +603,9 @@ class FileLog {
                     savedActions: string[],
                     failedActions: string[],
                     savedConcepts: string[],
-                    failedConcepts: string[]
+                    failedConcepts: string[],
+                    savedFunctions: string[],
+                    failedFunctions: string[]
                 };
                 const updateAndKeep = (event: AbstractEvent, saved: string[], failed: string[]) => {
                     if (saved.includes(event.getUniqueID())) {
@@ -585,6 +625,7 @@ class FileLog {
                 this.feedbackEvents = this.feedbackEvents.filter(event => updateAndKeep(event, response.savedFeedback, response.failedFeedback));
                 this.feedbackActionEvents = this.feedbackActionEvents.filter(event => updateAndKeep(event, response.savedActions, response.failedActions));
                 this.conceptV2Events = this.conceptV2Events.filter(event => updateAndKeep(event, response.savedConcepts, response.failedConcepts));
+                this.functionEvents = this.functionEvents.filter(event => updateAndKeep(event, response.savedConcepts, response.failedConcepts))
                 if (this.interactionEvents.length >= Logger.maxLogSize || this.conceptV2Events.length >= Logger.maxLogSize) {
                     this.checkAndSendData();
                 }
@@ -674,7 +715,7 @@ export class Logger {
 
         // Check user settings for telemetry (only log if it is enabled and logLevel is higher than none)
         this.isActive = env.isTelemetryEnabled && Logger.logLevel;
-        this.isDebugMode = false;
+        this.isDebugMode = false; // SET BACK TO FALSE BEFORE RELEASE!
 
         this.fileIDs = new Map();
 
@@ -781,6 +822,9 @@ export class Logger {
                         eventID = currentLog.addInteraction(doc.getText(), [change], time, eventType);
                     }
                 }
+                // rearrange blocks by id
+                const childBlocks: Map<string, Block> = new Map(sideLibResult.parse.blocks.children.map(c => [c.id, c]));
+
                 // Add misconception and feedback if detected
                 if (eventID > -1) {
                     for (const miscon of sideLibResult.parse.misconceptions) {
@@ -791,6 +835,12 @@ export class Logger {
                     }
                     for (const feedback of sideLibResult.feedback) {
                         currentLog.addFeedback(eventID, feedback);
+                    }
+                    for (const func of sideLibResult.parse.functions) {
+                        // sideLibResult.blocks.children - find the one with id matching block, get startIndex
+                        const funcBlock = childBlocks.get(func.block);
+                        let docIndex = funcBlock ? funcBlock.startIndex : -1;
+                        currentLog.addFunction(eventID, func, docIndex);
                     }
                 }
                 if (!this.isDebugMode) {

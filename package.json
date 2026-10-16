@@ -4,7 +4,7 @@
   "publisher": "supportive-ide",
   "description": "Provides additional diagnostics for common Python misconceptions",
   "icon": "images/icon.png",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "license": "MIT",
   "repository": "https://github.com/Supportive-IDE/pyguide",
   "engines": {
@@ -48,7 +48,11 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "Display feedback messages and diagnostics in the code as you type. If this is disabled, feedback can be requested by clicking the PyGuide status bar button.",
-          "tags":["help", "guidance", "configuration"]
+          "tags": [
+            "help",
+            "guidance",
+            "configuration"
+          ]
         }
       }
     }
@@ -69,7 +73,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
-    "@types/node": "20.x",
+    "@types/node": "^20.19.43",
     "@types/vscode": "^1.79.0",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",

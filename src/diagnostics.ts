@@ -12,7 +12,7 @@ import {
     ConfigurationTarget
 } from 'vscode';
 const sideLib = require('./lib/side-lib.es.js');
-import { Feedback, SideLibResult } from './types';
+import { Feedback, Misconception, SideLibResult } from './types';
 import { CODELENS_EXTERNAL_FEEDBACK, DIAGNOSTIC_EXTERNAL_FEEDBACK, EXTENSION_ID, EventTypes, REQUEST_USER_INPUT, RUN_PYGUIDE_DIAGNOSTICS, SHOW_CODE_LENS, SHOW_EXTERNAL_FEEDBACK, createCommand, errorIndicators, warningIndicators } from './utils';
 import { Logger } from './logging';
 
@@ -41,10 +41,12 @@ export function refreshDiagnostics(doc: TextDocument,
         const codeLenses: CodeLens[] = [];
         paramsMap.clear();
         // Check for misconceptions and feedback 
-        const result: SideLibResult = sideLib.feedback(doc.getText(), true, {showConcepts: true});
+        const result: SideLibResult = sideLib.feedback(doc.getText(), true, {showConcepts: true, showFunctions: true, showBlocks: true});
 
         // Log all results
         sendToLog(doc, result, logger, changes, eventType);
+
+        filterIrrelevantFeedback(result, changes);
 
         const feedbackCountByLine = getFeedbackCountByLine(result.feedback, doc);
 
@@ -101,6 +103,37 @@ export function refreshDiagnostics(doc: TextDocument,
                 });
                 
             }
+        }
+    }
+}
+
+function filterIrrelevantFeedback(results: SideLibResult, changes: readonly TextDocumentContentChangeEvent[]) {
+    // If there are no changes, return the original results
+    if (changes.length > 0) {
+        // Get the edit location
+        const editLocation = changes[0].rangeOffset;
+        const failingMiscons:Misconception[] = [];
+        const toCheck = results.parse.misconceptions.filter(m => m.type === "FunctionCallsNoParentheses" || m.type === "ParenthesesOnlyIfArgument");
+        for (const miscon of toCheck) {
+            const failingOccurrences = miscon.occurrences.filter(occurrence => {
+                return occurrence.reason.contributingSymptoms.some(symptom => Math.abs(editLocation - (symptom.docIndex + symptom.text.length)) < 2);
+            });
+            // Remove feedback for failing occurrences
+            for (const occurrence of failingOccurrences) {
+                results.feedback = results.feedback.filter(f => f.type !== miscon.type || (f.type === miscon.type && f.docIndex !== occurrence.reason.contributingSymptoms[0].docIndex));
+            }
+            // Remove miscon if no occurrences remain
+            if (miscon.occurrences.length === failingOccurrences.length) {
+                failingMiscons.push(miscon);
+            }
+            // Remove occurrences from miscon
+            else {
+                miscon.occurrences = miscon.occurrences.filter(occurrence => !failingOccurrences.includes(occurrence));
+            }
+        }
+        // Remove failing miscons from results
+        if (failingMiscons.length > 0) {
+            results.parse.misconceptions = results.parse.misconceptions.filter(m => !failingMiscons.includes(m));
         }
     }
 }

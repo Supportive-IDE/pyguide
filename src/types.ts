@@ -2,6 +2,7 @@ export type Block = {
     id: string,
     startLine: number,
     children: Block[]
+    startIndex: number
 };
 
 export type UserDefinedFunction = {
@@ -59,7 +60,7 @@ export type Graph = {
 };
 
 export type DocInfo = {
-    blocks: Block[],
+    blocks: Block,
     functions: UserDefinedFunction[],
     symptoms: Symptom[],
     misconceptions: Misconception[],
