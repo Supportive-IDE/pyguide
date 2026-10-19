@@ -39,6 +39,9 @@ This extension contributes the following settings:
 This extension can only detect issues that are task independent—it cannot detect logic errors or strategic errors that would require knowledge of what you are working on. It is intended for beginner programmers so may not work with more advanced concepts and syntax.
 
 ## Release Notes
+### 0.5.5
+Fixes a bug where letters with diacritics were not recognised as valid letters, causing problems for detection of symptoms related to identifiers.
+
 ### 0.5.4
 Reduced triggers for feedback about missing parentheses after a function name. This feedback will now only trigger if the user is editing more than two characters away from the end of the function name.
 
