@@ -4,7 +4,7 @@
   "publisher": "supportive-ide",
   "description": "Provides additional diagnostics for common Python misconceptions",
   "icon": "images/icon.png",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "license": "MIT",
   "repository": "https://github.com/Supportive-IDE/pyguide",
   "engines": {
